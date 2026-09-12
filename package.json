@@ -1,0 +1,21 @@
+{
+  "name": "js-automation-basics",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "internship project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ekaterina-2005/JS-automation-basics.git"
+  },
+  "keywords": [],
+  "author": "Katsiaryna Kandratsenka",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ekaterina-2005/JS-automation-basics/issues"
+  },
+  "homepage": "https://github.com/ekaterina-2005/JS-automation-basics#readme"
+}
