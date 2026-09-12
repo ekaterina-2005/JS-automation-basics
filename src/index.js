@@ -1,7 +1,7 @@
 // @ts-check
 
 import assert from "node:assert";
-import { BACKEND_DATA } from "../config/constants.js";
+import { BACKEND_DATA, RAW_CONFIG } from "../config/constants.js";
 import {
   filterOldSchool,
   transformOldSchool,
@@ -12,6 +12,7 @@ import {
   transformModern,
   aggregateModern,
 } from "./utils/modernMethods.js";
+import { normalizeConfig } from "./utils/configNormalizer.js";
 
 // Terminal input: node src/index.js
 assert.deepStrictEqual(
@@ -30,4 +31,10 @@ assert.strictEqual(
   aggregateOldSchool(BACKEND_DATA),
   aggregateModern(BACKEND_DATA),
   "Aggregate mismatch:  The results of the for-loop and array.reduce() are not equal.",
+);
+
+assert.deepStrictEqual(
+  normalizeConfig(RAW_CONFIG),
+  { url: "https://eu-region.shop.com", currency: "EUR", role: "viewer" },
+  "Normalized config object does not match the expected structure or default values.",
 );

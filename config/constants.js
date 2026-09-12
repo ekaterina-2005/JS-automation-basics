@@ -8,3 +8,12 @@ export const BACKEND_DATA = [
   },
 ];
 export const TRUE_STRING = "true";
+export const RAW_CONFIG = {
+  gateway: "https://eu-region.shop.com",
+  // currency: "EUR", - must be added
+  userDetails: {
+    // profile: { role: "admin" } - must be added
+  },
+};
+export const CURRENCY = "EUR";
+export const ROLE = "viewer";
