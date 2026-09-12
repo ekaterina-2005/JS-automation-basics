@@ -3,7 +3,7 @@ import { TRUE_STRING } from "../../config/constants.js";
 import { parseCurrentPrice } from "./cleaner.js";
 
 /**
- * Filters an array of products by their publication status.
+ * Filters an array of products by their publication status using .filter().
  * Supports both boolean true and string "true" as valid published states.
  *
  * @param {Array} data - The array of product objects to filter.
@@ -25,7 +25,7 @@ export function filterModern(data, targetStatus) {
 }
 
 /**
- * Extracts product names from an array of objects and converts them to uppercase.
+ * Extracts product names from an array of objects and converts them to uppercase using .map().
  *
  * @param {Array<{ productName: string, [key: string]: any }>} data - The array of product objects to transform.
  * @returns {string[]} A new array containing the uppercase product names.
@@ -46,7 +46,7 @@ export function transformModern(data) {
 }
 
 /**
- * Calculates the total cost of all valid items in the cart.
+ * Calculates the total cost of all valid items in the cart using .reduce().
  *
  * @param {Array} data - An array of product objects containing currentPrice and stockQty.
  * @returns {number} The total calculated price of all products.
