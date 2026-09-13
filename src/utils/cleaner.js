@@ -3,7 +3,7 @@ import { InvalidInputError } from "./errors.js";
 /**
  * Parses a price string and returns a clean number.
  *
- * @param {string} - The string containing the price in the beginning.
+ * @param {string} priceString - The string containing the price in the beginning.
  * @returns {number} The parsed price as a number.
  * @throws {InvalidInputError} If the argument is not a string.
  */

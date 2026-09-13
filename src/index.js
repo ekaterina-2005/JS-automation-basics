@@ -1,7 +1,12 @@
 // @ts-check
 
 import assert from "node:assert";
-import { BACKEND_DATA, RAW_CONFIG } from "../config/constants.js";
+import {
+  BACKEND_DATA,
+  FILTER_STATUS,
+  RAW_CONFIG,
+  EXPECTED_CONFIG,
+} from "../config/constants.js";
 import {
   filterOldSchool,
   transformOldSchool,
@@ -14,10 +19,14 @@ import {
 } from "./utils/modernMethods.js";
 import { normalizeConfig } from "./utils/configNormalizer.js";
 
-// Terminal input: node src/index.js
+/* 
+Terminal inputs: 
+node src/index.js
+npm run lint
+*/
 assert.deepStrictEqual(
-  filterOldSchool(BACKEND_DATA, true),
-  filterModern(BACKEND_DATA, true),
+  filterOldSchool(BACKEND_DATA, FILTER_STATUS),
+  filterModern(BACKEND_DATA, FILTER_STATUS),
   "Filter mismatch: The results of the for-loop and array.filter() are not equal.",
 );
 
@@ -35,6 +44,6 @@ assert.strictEqual(
 
 assert.deepStrictEqual(
   normalizeConfig(RAW_CONFIG),
-  { url: "https://eu-region.shop.com", currency: "EUR", role: "viewer" },
+  EXPECTED_CONFIG,
   "Normalized config object does not match the expected structure or default values.",
 );

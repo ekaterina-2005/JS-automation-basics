@@ -1,4 +1,5 @@
 import { InvalidInputError } from "./errors.js";
+import { isDataArray } from "./validators.js";
 import { TRUE_STRING } from "../../config/constants.js";
 import { parseCurrentPrice } from "./cleaner.js";
 
@@ -55,7 +56,7 @@ export function transformModern(data) {
 export function aggregateModern(data) {
   isDataArray(data);
 
-  let totalPrice = data.reduce((total, product) => {
+  const totalPrice = data.reduce((total, product) => {
     if (!product || typeof product.stockQty !== "number") {
       return total;
     }
@@ -64,10 +65,4 @@ export function aggregateModern(data) {
   }, 0);
 
   return totalPrice;
-}
-
-function isDataArray(data) {
-  if (!Array.isArray(data)) {
-    throw new InvalidInputError("Data argument must be a valid array.");
-  }
 }
