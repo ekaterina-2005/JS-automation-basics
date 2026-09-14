@@ -5,7 +5,8 @@
   "description": "internship project",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node src/index.js",
+    "lint": "eslint src/**/*.js"
   },
   "repository": {
     "type": "git",
@@ -17,5 +18,10 @@
   "bugs": {
     "url": "https://github.com/ekaterina-2005/JS-automation-basics/issues"
   },
-  "homepage": "https://github.com/ekaterina-2005/JS-automation-basics#readme"
+  "homepage": "https://github.com/ekaterina-2005/JS-automation-basics#readme",
+  "devDependencies": {
+    "eslint": "^10.10.0",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.9.6"
+  }
 }
