@@ -1,4 +1,3 @@
-import { InvalidInputError } from "./errors.js";
 import { isDataArray } from "./validators.js";
 import { TRUE_STRING } from "../../config/constants.js";
 import { parseCurrentPrice } from "./cleaner.js";

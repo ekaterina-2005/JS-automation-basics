@@ -1,3 +1,5 @@
+import { InvalidInputError } from "./errors.js";
+
 /**
  * Validates whether the provided data is an array.
  * @param {unknown} data - The argument to validate.

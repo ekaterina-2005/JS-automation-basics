@@ -17,8 +17,12 @@ export function normalizeConfig(rawConfig) {
     throw new InvalidInputError("Data argument must be a non-empty object.");
   }
 
-  if (rawConfig.gateway === null) {
+  if (!rawConfig.gateway) {
     throw new InvalidInputError("Data argument must have а non-empty gateway.");
+  }
+
+  if (typeof rawConfig.gateway !== "string") {
+    throw new InvalidInputError("Gateway must be a string.");
   }
 
   // Destructuring
