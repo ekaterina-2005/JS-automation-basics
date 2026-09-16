@@ -14,5 +14,5 @@ export function parseCurrentPrice(priceString) {
   if (typeof priceString !== "string") {
     throw new InvalidInputError("Price must be a string.");
   }
-  return Number.parseFloat(priceString);
+  return Number.parseFloat(priceString.replace(/[a-zA-Z\s]/g, ""));
 }
