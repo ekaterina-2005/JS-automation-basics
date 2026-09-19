@@ -8,6 +8,9 @@ import {
   RAW_CONFIG,
   EXPECTED_CONFIG,
   USERS_ID,
+  DELAY_FETCH_URL,
+  FALSE_FETCH_URL,
+  ATTEMPTS,
 } from '../config/constants.js';
 import {
   filterOldSchool,
@@ -21,6 +24,7 @@ import {
 } from './utils/modernMethods.js';
 import { normalizeConfig } from './utils/configNormalizer.js';
 import { ReqResClient } from './ReqResClient.js';
+import { pollUntilReady } from './tasks.js';
 
 // Sprint #1
 assert.deepStrictEqual(
@@ -62,4 +66,34 @@ assert.strictEqual(
   emails.length,
   USERS_ID.length,
   `The length of the emails array must be exactly ${USERS_ID.length}.`,
+);
+
+/**
+ * Generic fetch helper to test arbitrary URLs.
+ * @param {string} url - The URL to fetch.
+ * @returns {Promise<any>}
+ */
+async function fetchTestUrl(url) {
+  const response = await fetch(url);
+  if (!response.ok) {
+    const error = new Error(`HTTP ${response.status}`);
+    Object.assign(error, { status: response.status });
+    throw error;
+  }
+
+  return response.json();
+}
+
+const smartFetch = pollUntilReady(fetchTestUrl, () => true, ATTEMPTS);
+
+await assert.doesNotReject(async () => {
+  await smartFetch(DELAY_FETCH_URL);
+}, 'smartFetch should wait for 3 seconds and successfully return data without throwing');
+
+await assert.rejects(
+  async () => {
+    await smartFetch(FALSE_FETCH_URL);
+  },
+  Error,
+  'smartFetch should throw an error after max attempts.',
 );
