@@ -24,7 +24,7 @@ export class ReqResClient {
    * @param {string} endpoint - The API endpoint to call.
    * @param {RequestInit} [options={}] - Fetch options (method, headers, body, etc.).
    * @returns {Promise<any>} A promise resolving to the parsed JSON response.
-   * @throws {Error} If the HTTP response status is not OK.
+   * @throws {Error & { status?: number }} If the HTTP response status is not OK.
    */
   async _request(endpoint, options = {}) {
     const response = await fetch(`${this.baseUrl}${endpoint}`, options);
@@ -40,7 +40,7 @@ export class ReqResClient {
   /**
    * Gets a specific user by their ID.
    * @param {number|string} id - The unique identifier of the user.
-   * @returns {Promise<Object>} A promise resolving to the user data.
+   * @returns {Promise<{ data: { email: string, [key: string]: any } }>} A promise resolving to the user data.
    */
   async getUser(id) {
     return this._request(`/api/users/${id}`, {

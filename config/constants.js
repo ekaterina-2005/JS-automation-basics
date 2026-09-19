@@ -24,3 +24,4 @@ export const EXPECTED_CONFIG = {
 export const CURRENCY = 'EUR';
 export const ROLE = 'viewer';
 export const CONTEXT_TIMEOUT_MS = 1000;
+export const USERS_ID = [1, 2, 3];
