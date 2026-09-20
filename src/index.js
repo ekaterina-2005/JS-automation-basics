@@ -15,6 +15,7 @@ import {
   TIMEOUT_MS,
   CACHE_TTL,
   USER_URL,
+  ALLOWED_STATUSES,
 } from '../config/constants.js';
 import {
   filterOldSchool,
@@ -28,7 +29,13 @@ import {
 } from './utils/modernMethods.js';
 import { normalizeConfig } from './utils/configNormalizer.js';
 import { ReqResClient } from './ReqResClient.js';
-import { pollUntilReady, withTimeout, withCache } from './tasks.js';
+import {
+  pollUntilReady,
+  withLogging,
+  withValidation,
+  withTimeout,
+  withCache,
+} from './tasks.js';
 
 // Sprint #1
 assert.deepStrictEqual(
@@ -76,7 +83,7 @@ assert.strictEqual(
  * Generic fetch helper to test arbitrary URLs.
  *
  * @param {string} url - The URL to fetch.
- * @param {object} options - Additional options that can be added by HOF.
+ * @param {RequestInit} [options={}] - Additional options that can be added by HOF.
  * @returns {Promise<any>}
  */
 async function fetchTestUrl(url, options = {}) {
@@ -142,3 +149,55 @@ assert(
   firstTime > secondTime,
   'The cached response should be significantly faster than the network response.',
 );
+
+/**
+ * Raw fetch wrapper to pass into HOFs.
+ *
+ * @param {string} url - The URL to fetch.
+ * @param {RequestInit} [options={}] - Additional options that can be added by HOF.
+ * @returns {Promise<Response>}
+ */
+async function rawFetch(url, options = {}) {
+  return fetch(url, options);
+}
+
+/**
+ * The key difference between the tests below lies in the order of HOF composition.
+ * Placing logging outside the polling decorator logs only the final outcome once.
+ * Wrapping logging inside the polling decorator triggers a log for each retry attempt.
+ */
+// withValidation -> withLogging -> pollUntilReady
+const fetchWithValidation = withValidation(rawFetch, ALLOWED_STATUSES);
+const fetchWithPolling = pollUntilReady(
+  fetchWithValidation,
+  () => true,
+  ATTEMPTS,
+);
+const superFetch = withLogging(fetchWithPolling);
+
+await assert.doesNotReject(async () => {
+  const data = await superFetch(USER_URL);
+  assert(data, 'superFetch must return parsed JSON data on success.');
+}, 'superFetch must successfully fetch and validate valid URLs.');
+
+await assert.rejects(async () => {
+  await superFetch(FALSE_FETCH_URL);
+}, `superFetch must throw an error on 500 status after ${ATTEMPTS} attempts.`);
+
+// withValidation -> pollUntilReady -> withLogging
+const fetchWithValidation2 = withValidation(rawFetch, ALLOWED_STATUSES);
+const fetchWithLogging = withLogging(fetchWithValidation2);
+const superFetchInverted = pollUntilReady(
+  fetchWithLogging,
+  () => true,
+  ATTEMPTS,
+);
+
+await assert.doesNotReject(async () => {
+  const data = await superFetchInverted(USER_URL);
+  assert(data, 'superFetchInverted must return parsed JSON data on success.');
+}, 'superFetchInverted must successfully fetch valid URLs.');
+
+await assert.rejects(async () => {
+  await superFetchInverted(FALSE_FETCH_URL);
+}, `superFetchInverted must throw an error on 500 status after ${ATTEMPTS} attempts.`);

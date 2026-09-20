@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { DELAY_MS } from '../config/constants.js';
 
 /**
@@ -32,22 +33,84 @@ export function pollUntilReady(asyncFn, conditionFn, maxAttempts) {
       } catch (error) {
         lastError = error;
 
-        if (error.status >= 400 && error.status < 500) {
+        if (error.status && error.status >= 400 && error.status < 500) {
           throw error;
         }
       }
 
       if (attempt === maxAttempts) {
         throw new Error(
-          `The limit of ${maxAttempts} attempts has been reached. Last error: ${
-            lastError ? lastError.message : 'Condition not met'
-          }.`,
+          `The limit of ${maxAttempts} attempts has been reached. Last error - ${
+            lastError ? lastError.message : 'condition not met'
+          }`,
         );
       }
 
       await delay(delayTime);
       delayTime *= 2;
     }
+  };
+}
+
+/**
+ * HOF that measures and logs the execution time of an async function.
+ *
+ * @param {Function} asyncFn - The original async function to execute.
+ * @param {number} [threshold=0] - The threshold in milliseconds for the SLOW warning.
+ * @returns {Function} A new async function with logging capabilities.
+ */
+export function withLogging(asyncFn, threshold = 0) {
+  return async function (...args) {
+    console.log(
+      `[Call] The function was called with arguments: ${JSON.stringify(args)}.`,
+    );
+    const start = performance.now();
+    try {
+      const result = await asyncFn(...args);
+      const time = performance.now() - start;
+      console.log(`[Success] Operation completed, time: ${time.toFixed(0)}ms.`);
+
+      if (threshold > 0 && time > threshold) {
+        console.warn(
+          `[SLOW] The request took ${time.toFixed(0)}ms, which is longer than the ${threshold}ms.`,
+        );
+      }
+
+      return result;
+    } catch (error) {
+      const time = (performance.now() - start).toFixed(0);
+      console.error(`[API Error] ${error.message}, time: ${time}ms.`);
+
+      throw error;
+    }
+  };
+}
+
+/**
+ * HOF that validates the HTTP response status.
+ *
+ * @param {Function} fetchFn - The original async function returning a raw Response.
+ * @param {number[]} allowedStatuses - An array of allowed HTTP status codes.
+ * @returns {Function} A new async function with validation.
+ */
+export function withValidation(fetchFn, allowedStatuses) {
+  return async function (...args) {
+    const response = await fetchFn(...args);
+    const isAllowed = allowedStatuses.includes(response.status);
+
+    if (isAllowed) {
+      return await response.json();
+    }
+
+    const errorBody = await response.text();
+    const statusText = response.statusText
+      ? response.statusText.toLowerCase()
+      : 'error';
+    const errorMessage = `HTTP ${response.status}: ${errorBody.trim() || statusText}`;
+    const error = new Error(errorMessage);
+    Object.assign(error, { status: response.status });
+
+    throw error;
   };
 }
 

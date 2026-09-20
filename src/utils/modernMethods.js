@@ -1,7 +1,7 @@
-import { InvalidInputError } from "./errors.js";
-import { isDataArray } from "./validators.js";
-import { TRUE_STRING } from "../../config/constants.js";
-import { parseCurrentPrice } from "./cleaner.js";
+import { InvalidInputError } from './errors.js';
+import { isDataArray } from './validators.js';
+import { TRUE_STRING } from '../../config/constants.js';
+import { parseCurrentPrice } from './cleaner.js';
 
 /**
  * Filters an array of products by their publication status using .filter().
@@ -36,10 +36,10 @@ export function transformModern(data) {
   isDataArray(data);
 
   const transformedProductNames = data.map((product) => {
-    if (typeof product.productName === "string") {
+    if (typeof product.productName === 'string') {
       return product.productName.toUpperCase();
     } else {
-      throw new InvalidInputError("All product names must be a string.");
+      throw new InvalidInputError('All product names must be a string.');
     }
   });
 
@@ -57,7 +57,7 @@ export function aggregateModern(data) {
   isDataArray(data);
 
   const totalPrice = data.reduce((total, product) => {
-    if (!product || typeof product.stockQty !== "number") {
+    if (!product || typeof product.stockQty !== 'number') {
       return total;
     }
 
