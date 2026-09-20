@@ -11,6 +11,10 @@ import {
   DELAY_FETCH_URL,
   FALSE_FETCH_URL,
   ATTEMPTS,
+  DELAY_MS,
+  TIMEOUT_MS,
+  CACHE_TTL,
+  USER_URL,
 } from '../config/constants.js';
 import {
   filterOldSchool,
@@ -24,7 +28,7 @@ import {
 } from './utils/modernMethods.js';
 import { normalizeConfig } from './utils/configNormalizer.js';
 import { ReqResClient } from './ReqResClient.js';
-import { pollUntilReady } from './tasks.js';
+import { pollUntilReady, withTimeout, withCache } from './tasks.js';
 
 // Sprint #1
 assert.deepStrictEqual(
@@ -70,11 +74,13 @@ assert.strictEqual(
 
 /**
  * Generic fetch helper to test arbitrary URLs.
+ *
  * @param {string} url - The URL to fetch.
+ * @param {object} options - Additional options that can be added by HOF.
  * @returns {Promise<any>}
  */
-async function fetchTestUrl(url) {
-  const response = await fetch(url);
+async function fetchTestUrl(url, options = {}) {
+  const response = await fetch(url, options);
   if (!response.ok) {
     const error = new Error(`HTTP ${response.status}`);
     Object.assign(error, { status: response.status });
@@ -84,16 +90,55 @@ async function fetchTestUrl(url) {
   return response.json();
 }
 
-const smartFetch = pollUntilReady(fetchTestUrl, () => true, ATTEMPTS);
+const fetchWithPollUntilReady = pollUntilReady(
+  fetchTestUrl,
+  () => true,
+  ATTEMPTS,
+);
 
-await assert.doesNotReject(async () => {
-  await smartFetch(DELAY_FETCH_URL);
-}, 'smartFetch should wait for 3 seconds and successfully return data without throwing');
+await assert.doesNotReject(
+  async () => {
+    await fetchWithPollUntilReady(DELAY_FETCH_URL);
+  },
+  `fetchWithPollUntilReady should wait for ${Math.floor(DELAY_MS / 1000)} seconds and successfully return data without throwing`,
+);
 
 await assert.rejects(
   async () => {
-    await smartFetch(FALSE_FETCH_URL);
+    await fetchWithPollUntilReady(FALSE_FETCH_URL);
   },
   Error,
-  'smartFetch should throw an error after max attempts.',
+  `fetchWithPollUntilReady should throw an error after ${ATTEMPTS} attempts.`,
+);
+
+const fetchWithTimeout = withTimeout(fetchTestUrl, TIMEOUT_MS);
+
+// The delay in DELAY_FETCH_URL must be more than TIMEOUT_MS
+await assert.rejects(
+  async () => {
+    await fetchWithTimeout(DELAY_FETCH_URL);
+  },
+  new Error('Request Timeout'),
+  'fetchWithTimeout should throw a Request Timeout error when the server takes too long.',
+);
+
+const fetchWithCache = withCache(fetchTestUrl, CACHE_TTL);
+
+const firstStart = performance.now();
+const firstData = await fetchWithCache(USER_URL);
+const firstTime = performance.now() - firstStart;
+
+const secondStart = performance.now();
+const secondData = await fetchWithCache(USER_URL);
+const secondTime = performance.now() - secondStart;
+
+assert.deepStrictEqual(
+  firstData,
+  secondData,
+  'Cached data must be identical to fetched data.',
+);
+
+assert(
+  firstTime > secondTime,
+  'The cached response should be significantly faster than the network response.',
 );

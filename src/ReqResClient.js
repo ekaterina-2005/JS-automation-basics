@@ -8,6 +8,7 @@ export class ReqResClient {
   /**
    * Initializes the ReqRes API client.
    * Reads the base URL and API key from environment variables.
+   *
    * @throws {Error} If API_BASE_URL is not provided in the environment.
    */
   constructor() {
@@ -20,6 +21,7 @@ export class ReqResClient {
 
   /**
    * Core request method that wraps the native fetch API.
+   *
    * @private
    * @param {string} endpoint - The API endpoint to call.
    * @param {RequestInit} [options={}] - Fetch options (method, headers, body, etc.).
@@ -39,6 +41,7 @@ export class ReqResClient {
 
   /**
    * Gets a specific user by their ID.
+   *
    * @param {number|string} id - The unique identifier of the user.
    * @returns {Promise<{ data: { email: string, [key: string]: any } }>} A promise resolving to the user data.
    */
@@ -50,6 +53,7 @@ export class ReqResClient {
 
   /**
    * Creates a new user with the provided data.
+   *
    * @param {Object} userData - The data for the new user.
    * @returns {Promise<Object>} A promise resolving to the created user's data.
    */
@@ -78,6 +82,7 @@ export class ReqResClient {
    */
   testContext() {
     setTimeout(() => {
+      // eslint-disable-next-line no-console
       console.log(this.baseUrl);
     }, CONTEXT_TIMEOUT_MS);
   }

@@ -29,3 +29,6 @@ export const DELAY_MS = 1000;
 export const DELAY_FETCH_URL = 'https://reqres.in/api/users?delay=3';
 export const FALSE_FETCH_URL = 'https://httpstat.us/500';
 export const ATTEMPTS = 3;
+export const TIMEOUT_MS = 1000;
+export const CACHE_TTL = 5000;
+export const USER_URL = 'https://reqres.in/api/users/2';
