@@ -10,6 +10,9 @@ export default defineConfig([
     languageOptions: { globals: globals.node },
     rules: {
       'no-console': 'warn',
+      'no-var': 'error',
+      'prefer-const': 'error',
+      eqeqeq: 'error',
     },
   },
 ]);

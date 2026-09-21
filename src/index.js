@@ -97,9 +97,15 @@ async function fetchTestUrl(url, options = {}) {
   return response.json();
 }
 
+// The variable simulates the checking of the result.
+let pollAttempts = 0;
+
 const fetchWithPollUntilReady = pollUntilReady(
   fetchTestUrl,
-  () => true,
+  (data = {}) => {
+    pollAttempts++;
+    return pollAttempts >= 3 && Boolean(data);
+  },
   ATTEMPTS,
 );
 
@@ -120,7 +126,7 @@ await assert.rejects(
 
 const fetchWithTimeout = withTimeout(fetchTestUrl, TIMEOUT_MS);
 
-// The delay in DELAY_FETCH_URL must be more than TIMEOUT_MS
+// The delay in DELAY_FETCH_URL must be more than TIMEOUT_MS.
 await assert.rejects(
   async () => {
     await fetchWithTimeout(DELAY_FETCH_URL);

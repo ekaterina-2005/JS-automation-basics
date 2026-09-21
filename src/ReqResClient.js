@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import { CONTEXT_TIMEOUT_MS } from '../config/constants.js';
+import { InvalidInputError } from './utils/errors.js';
 
 /**
  * Client class for interacting with the ReqRes API.
@@ -15,6 +16,11 @@ export class ReqResClient {
     if (!process.env.API_BASE_URL) {
       throw new Error('API_BASE_URL must be a non-empty URL.');
     }
+
+    if (!process.env.REQRES_API_KEY) {
+      throw new Error('REQRES_API_KEY must be provided in the environment.');
+    }
+
     this.baseUrl = process.env.API_BASE_URL;
     this.apiKey = process.env.REQRES_API_KEY;
   }
@@ -31,9 +37,9 @@ export class ReqResClient {
   async _request(endpoint, options = {}) {
     const response = await fetch(`${this.baseUrl}${endpoint}`, options);
     if (!response.ok) {
-      const err = new Error(`HTTP ${response.status}`);
-      err.status = response.status;
-      throw err;
+      const error = new Error(`HTTP ${response.status}`);
+      error.status = response.status;
+      throw error;
     }
 
     return response.json();
@@ -46,6 +52,10 @@ export class ReqResClient {
    * @returns {Promise<{ data: { email: string, [key: string]: any } }>} A promise resolving to the user data.
    */
   async getUser(id) {
+    if (!Number.isInteger(id) || id <= 0) {
+      throw new InvalidInputError('User id must be provided.');
+    }
+
     return this._request(`/api/users/${id}`, {
       headers: { 'x-api-key': this.apiKey },
     });
@@ -58,6 +68,10 @@ export class ReqResClient {
    * @returns {Promise<Object>} A promise resolving to the created user's data.
    */
   async createUser(userData) {
+    if (!userData || typeof userData !== 'object') {
+      throw new InvalidInputError('userData must be a non-empty object.');
+    }
+
     return this._request(`/api/users`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-api-key': this.apiKey },

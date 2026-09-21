@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { DELAY_MS } from '../config/constants.js';
 
 /**
@@ -19,6 +18,18 @@ export const delay = (ms) => new Promise((r) => setTimeout(r, ms));
  * @throws {Error} If the limit of `maxAttempts` has been reached, throws an Error with the last error.
  */
 export function pollUntilReady(asyncFn, conditionFn, maxAttempts) {
+  if (typeof asyncFn !== 'function') {
+    throw new TypeError('asyncFn must be a function.');
+  }
+
+  if (typeof conditionFn !== 'function') {
+    throw new TypeError('conditionFn must be a function.');
+  }
+
+  if (!Number.isInteger(maxAttempts) || maxAttempts <= 0) {
+    throw new TypeError('maxAttempts must be a positive number.');
+  }
+
   return async function (...args) {
     let delayTime = DELAY_MS;
     let lastError = null;
@@ -32,10 +43,6 @@ export function pollUntilReady(asyncFn, conditionFn, maxAttempts) {
         }
       } catch (error) {
         lastError = error;
-
-        if (error.status && error.status >= 400 && error.status < 500) {
-          throw error;
-        }
       }
 
       if (attempt === maxAttempts) {
@@ -60,7 +67,16 @@ export function pollUntilReady(asyncFn, conditionFn, maxAttempts) {
  * @returns {Function} A new async function with logging capabilities.
  */
 export function withLogging(asyncFn, threshold = 0) {
+  if (typeof asyncFn !== 'function') {
+    throw new TypeError('asyncFn must be a function.');
+  }
+
+  if (typeof threshold !== 'number' || threshold < 0) {
+    throw new TypeError('threshold must be a non-negative number.');
+  }
+
   return async function (...args) {
+    // eslint-disable-next-line no-console
     console.log(
       `[Call] The function was called with arguments: ${JSON.stringify(args)}.`,
     );
@@ -68,9 +84,11 @@ export function withLogging(asyncFn, threshold = 0) {
     try {
       const result = await asyncFn(...args);
       const time = performance.now() - start;
+      // eslint-disable-next-line no-console
       console.log(`[Success] Operation completed, time: ${time.toFixed(0)}ms.`);
 
       if (threshold > 0 && time > threshold) {
+        // eslint-disable-next-line no-console
         console.warn(
           `[SLOW] The request took ${time.toFixed(0)}ms, which is longer than the ${threshold}ms.`,
         );
@@ -79,6 +97,7 @@ export function withLogging(asyncFn, threshold = 0) {
       return result;
     } catch (error) {
       const time = (performance.now() - start).toFixed(0);
+      // eslint-disable-next-line no-console
       console.error(`[API Error] ${error.message}, time: ${time}ms.`);
 
       throw error;
@@ -94,6 +113,14 @@ export function withLogging(asyncFn, threshold = 0) {
  * @returns {Function} A new async function with validation.
  */
 export function withValidation(fetchFn, allowedStatuses) {
+  if (typeof fetchFn !== 'function') {
+    throw new TypeError('fetchFn must be a function.');
+  }
+
+  if (!Array.isArray(allowedStatuses) || allowedStatuses.length === 0) {
+    throw new TypeError('allowedStatuses must be a non-empty array.');
+  }
+
   return async function (...args) {
     const response = await fetchFn(...args);
     const isAllowed = allowedStatuses.includes(response.status);
@@ -119,12 +146,20 @@ export function withValidation(fetchFn, allowedStatuses) {
  * If the original function does not return a response within the specified time,
  * the request is aborted and a timeout error is thrown.
  *
- * @param {Function} fetchFn - The original async function to execute (must accept an options object with a `signal` property).
+ * @param {Function} fetchFn - The original async function to execute (must accept an options object for a new `signal` property as a second parameter).
  * @param {number} timeoutMs - The allowed time in milliseconds before aborting the request.
  * @returns {Function} A new async function that applies the timeout logic.
  * @throws {Error} If the request takes longer than `timeoutMs`, throws an Error with the message 'Request Timeout'.
  */
 export function withTimeout(fetchFn, timeoutMs) {
+  if (typeof fetchFn !== 'function') {
+    throw new TypeError('fetchFn must be a function.');
+  }
+
+  if (typeof timeoutMs !== 'number' || timeoutMs <= 0) {
+    throw new TypeError('timeoutMs must be a positive number.');
+  }
+
   return async function (...args) {
     const controller = new AbortController();
 
@@ -132,8 +167,12 @@ export function withTimeout(fetchFn, timeoutMs) {
       controller.abort();
     }, timeoutMs);
 
+    const url = args[0];
+    const options = args[1] || {};
+    const mergedOptions = { ...options, signal: controller.signal };
+
     try {
-      const result = await fetchFn(...args, { signal: controller.signal });
+      const result = await fetchFn(url, mergedOptions, ...args.slice(2));
       return result;
     } catch (error) {
       if (error.name === 'AbortError') {
@@ -156,6 +195,14 @@ export function withTimeout(fetchFn, timeoutMs) {
  * @returns {Function} A new async function that uses caching.
  */
 export function withCache(fetchFn, ttlMs) {
+  if (typeof fetchFn !== 'function') {
+    throw new TypeError('fetchFn must be a function.');
+  }
+
+  if (typeof ttlMs !== 'number' || ttlMs <= 0) {
+    throw new TypeError('ttlMs must be a positive number.');
+  }
+
   const cache = new Map();
 
   return async function (...args) {
