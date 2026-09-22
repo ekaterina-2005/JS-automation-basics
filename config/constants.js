@@ -24,6 +24,7 @@ export const EXPECTED_CONFIG = {
 export const CURRENCY = 'EUR';
 export const ROLE = 'viewer';
 export const CONTEXT_TIMEOUT_MS = 1000;
+export const API_USERS = `api/users`;
 export const USERS_ID = [1, 2, 3];
 export const DELAY_MS = 1000;
 export const DELAY_FETCH_URL = 'https://reqres.in/api/users?delay=3';

@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { CONTEXT_TIMEOUT_MS } from '../config/constants.js';
+import { API_USERS, CONTEXT_TIMEOUT_MS } from '../config/constants.js';
 import { InvalidInputError } from './utils/errors.js';
 
 /**
@@ -35,7 +35,9 @@ export class ReqResClient {
    * @throws {Error & { status?: number }} If the HTTP response status is not OK.
    */
   async _request(endpoint, options = {}) {
-    const response = await fetch(`${this.baseUrl}${endpoint}`, options);
+    const url = new URL(endpoint, this.baseUrl);
+    const response = await fetch(url, options);
+
     if (!response.ok) {
       const error = new Error(`HTTP ${response.status}`);
       error.status = response.status;
@@ -56,7 +58,7 @@ export class ReqResClient {
       throw new InvalidInputError('User id must be provided.');
     }
 
-    return this._request(`/api/users/${id}`, {
+    return this._request(`${API_USERS}/${id}`, {
       headers: { 'x-api-key': this.apiKey },
     });
   }
@@ -72,7 +74,7 @@ export class ReqResClient {
       throw new InvalidInputError('userData must be a non-empty object.');
     }
 
-    return this._request(`/api/users`, {
+    return this._request(API_USERS, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-api-key': this.apiKey },
       body: JSON.stringify(userData),
