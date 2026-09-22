@@ -1,7 +1,7 @@
-import { InvalidInputError } from "./errors.js";
-import { isDataArray } from "./validators.js";
-import { TRUE_STRING } from "../../config/constants.js";
-import { parseCurrentPrice } from "./cleaner.js";
+import { InvalidInputError } from './errors.js';
+import { isDataArray } from './validators.js';
+import { TRUE_STRING } from '../../config/constants.js';
+import { parseCurrentPrice } from './cleaner.js';
 
 /**
  * Filters an array of products by their publication status using a classic for loop.
@@ -45,10 +45,10 @@ export function transformOldSchool(data) {
   for (let i = 0; i < data.length; i++) {
     const product = data[i];
 
-    if (typeof product.productName === "string") {
+    if (typeof product.productName === 'string') {
       transformedProductNames.push(product.productName.toUpperCase());
     } else {
-      throw new InvalidInputError("All product names must be a string.");
+      throw new InvalidInputError('All product names must be a string.');
     }
   }
 
@@ -70,7 +70,7 @@ export function aggregateOldSchool(data) {
   for (let i = 0; i < data.length; i++) {
     const product = data[i];
 
-    if (!product || typeof product.stockQty !== "number") {
+    if (!product || typeof product.stockQty !== 'number') {
       continue;
     }
 
