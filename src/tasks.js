@@ -32,11 +32,12 @@ export function pollUntilReady(asyncFn, conditionFn, maxAttempts) {
 
   return async function (...args) {
     let delayTime = DELAY_MS;
-    let lastError = null;
+    let lastError;
 
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
         const result = await asyncFn(...args);
+        lastError = null;
 
         if (conditionFn(result) === true) {
           return result;
@@ -50,6 +51,7 @@ export function pollUntilReady(asyncFn, conditionFn, maxAttempts) {
           `The limit of ${maxAttempts} attempts has been reached. Last error - ${
             lastError ? lastError.message : 'condition not met'
           }`,
+          { cause: lastError },
         );
       }
 
@@ -206,7 +208,19 @@ export function withCache(fetchFn, ttlMs) {
   const cache = new Map();
 
   return async function (...args) {
-    const key = JSON.stringify(args);
+    // Sort object keys so that {a, b} and {b, a} produce the same cache key
+    const key = JSON.stringify(args, (_, value) => {
+      if (value && typeof value === 'object' && !Array.isArray(value)) {
+        // If the value is an object with its own values
+        return Object.keys(value)
+          .sort()
+          .reduce((innerValues, sortedKey) => {
+            innerValues[sortedKey] = value[sortedKey];
+            return innerValues;
+          }, {});
+      }
+      return value;
+    });
     const now = Date.now();
 
     if (cache.has(key)) {
