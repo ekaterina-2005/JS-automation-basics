@@ -1,5 +1,5 @@
-import { InvalidInputError } from "./errors.js";
-import { CURRENCY, ROLE } from "../../config/constants.js";
+import { InvalidInputError } from './errors.js';
+import { CURRENCY, ROLE } from '../../config/constants.js';
 
 /**
  * Normalizes raw configuration object by extracting and formatting required fields.
@@ -11,18 +11,18 @@ import { CURRENCY, ROLE } from "../../config/constants.js";
 export function normalizeConfig(rawConfig) {
   if (
     rawConfig === null ||
-    typeof rawConfig !== "object" ||
+    typeof rawConfig !== 'object' ||
     Array.isArray(rawConfig)
   ) {
-    throw new InvalidInputError("Data argument must be a non-empty object.");
+    throw new InvalidInputError('Data argument must be a non-empty object.');
   }
 
   if (!rawConfig.gateway) {
-    throw new InvalidInputError("Data argument must have а non-empty gateway.");
+    throw new InvalidInputError('Data argument must have а non-empty gateway.');
   }
 
-  if (typeof rawConfig.gateway !== "string") {
-    throw new InvalidInputError("Gateway must be a string.");
+  if (typeof rawConfig.gateway !== 'string') {
+    throw new InvalidInputError('Gateway must be a string.');
   }
 
   // Destructuring

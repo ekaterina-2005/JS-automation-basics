@@ -1,4 +1,4 @@
-import { InvalidInputError } from "./errors.js";
+import { InvalidInputError } from './errors.js';
 
 /**
  * Parses a price string and returns a clean number.
@@ -11,8 +11,8 @@ export function parseCurrentPrice(priceString) {
   if (priceString === null || priceString === undefined) {
     return 0;
   }
-  if (typeof priceString !== "string") {
-    throw new InvalidInputError("Price must be a string.");
+  if (typeof priceString !== 'string') {
+    throw new InvalidInputError('Price must be a string.');
   }
-  return Number.parseFloat(priceString.replace(/[a-zA-Z\s]/g, ""));
+  return Number.parseFloat(priceString.replace(/[a-zA-Z\s]/g, ''));
 }
