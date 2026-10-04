@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "format": "prettier --write .",
-    "lint": "eslint src tests playwright.config.js",
+    "lint": "eslint src tests pages fixtures playwright.config.js",
     "prepare": "husky",
     "test": "node src/index.js",
     "test:all": "playwright test"
