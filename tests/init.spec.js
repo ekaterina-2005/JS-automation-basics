@@ -1,6 +1,7 @@
 // @ts-check
 
 import { test, expect } from '@playwright/test';
+import { ProductsPage } from '../pages/ProductsPage.js';
 
 /**
  * Gets the value of a cookie from the browser context by its name.
@@ -20,56 +21,44 @@ test.describe('Init (Popups)', () => {
     page,
     context,
   }) => {
-    const welcomeTitle = page.getByRole('heading', {
-      name: 'Welcome to OWASP Juice Shop!',
-    });
-    const closeWelcomeButton = page.getByRole('button', {
-      name: 'Close Welcome Banner',
-    });
-    const cookieBannerText = page.getByText(
-      'This website uses fruit cookies to ensure you get the juiciest tracking experience.',
-    );
-    const acceptCookiesButton = page.getByRole('button', {
-      name: 'dismiss cookie message',
-    });
+    const productsPage = new ProductsPage(page);
 
-    await page.goto('http://localhost:3000');
-    await expect(welcomeTitle).toBeVisible();
+    await productsPage.open();
+    await expect(productsPage.welcomeTitle).toBeVisible();
 
     await page.keyboard.press('Escape');
-    await expect(welcomeTitle).toBeHidden();
+    await expect(productsPage.welcomeTitle).toBeHidden();
     expect(
       await getCookieValue(context, 'welcomebanner_status'),
     ).toBeUndefined();
 
     await page.reload();
-    await expect(welcomeTitle).toBeVisible();
+    await expect(productsPage.welcomeTitle).toBeVisible();
 
-    await closeWelcomeButton.click();
-    await expect(welcomeTitle).toBeHidden();
+    await productsPage.closeWelcomeButton.click();
+    await expect(productsPage.welcomeTitle).toBeHidden();
     await expect
       .poll(() => getCookieValue(context, 'welcomebanner_status'))
       .toBe('dismiss');
-    await expect(cookieBannerText).toBeVisible();
+    await expect(productsPage.cookieBannerText).toBeVisible();
 
     await page.reload();
-    await expect(cookieBannerText).toBeVisible();
+    await expect(productsPage.cookieBannerText).toBeVisible();
     expect(
       await getCookieValue(context, 'cookieconsent_status'),
     ).toBeUndefined();
 
-    await acceptCookiesButton.click();
-    await expect(cookieBannerText).toBeHidden();
+    await productsPage.acceptCookiesButton.click();
+    await expect(productsPage.cookieBannerText).toBeHidden();
     await expect
       .poll(() => getCookieValue(context, 'cookieconsent_status'))
       .toBe('dismiss');
 
     await page.reload();
-    await expect(welcomeTitle).toBeHidden();
-    await expect(cookieBannerText).toBeHidden();
-    await page.getByRole('button', { name: 'Open Sidenav' }).click();
-    await expect(
-      page.getByRole('heading', { name: 'OWASP Juice Shop' }),
-    ).toBeVisible();
+    await expect(productsPage.welcomeTitle).toBeHidden();
+    await expect(productsPage.cookieBannerText).toBeHidden();
+    await expect(productsPage.basketCounter).toHaveText('0');
+    await productsPage.openSidenav();
+    await expect(productsPage.sidenavTitle).toBeVisible();
   });
 });
