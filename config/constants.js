@@ -34,3 +34,15 @@ export const TIMEOUT_MS = 1000;
 export const CACHE_TTL = 5000;
 export const USER_URL = 'https://reqres.in/api/users/2';
 export const ALLOWED_STATUSES = [200];
+
+// OWASP Juice Shop
+export const OWASP_LOGIN_PAGE_URL = '/#/login';
+export const OWASP_REGISTRATION_PAGE_URL = '/#/register';
+export const OWASP_PRODUCTS_PAGE_URL = '/#/search';
+export const OWASP_BASKET_PAGE_URL = '/#/basket';
+export const OWASP_CURRENCY = '¤';
+// OWASP Juice Shop: test user
+export const TEST_EMAIL_PREFIX = 'aqa.';
+export const TEST_EMAIL_DOMAIN = '@shop.test';
+export const TEST_USER_PASSWORD = 'Test@12345';
+export const TEST_SECURITY_ANSWER = 'Test';
