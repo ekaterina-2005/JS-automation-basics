@@ -1,64 +1,60 @@
 // @ts-check
 
 import { test, expect } from '@playwright/test';
-import { ProductsPage } from '../pages/ProductsPage.js';
+import { BasePage } from '../pages/BasePage.js';
+import { KEYS } from '../config/keycodes.js';
+import {
+  COOKIE_CONSENT_COOKIE,
+  DISMISSED_COOKIE_VALUE,
+  WELCOME_BANNER_COOKIE,
+} from '../config/constants.js';
+import { getCookieValue } from '../src/utils/cookies.js';
 
-/**
- * Gets the value of a cookie from the browser context by its name.
- *
- * @param {import('@playwright/test').BrowserContext} context - The browser context of the current test.
- * @param {string} name - The name of the cookie to find.
- * @returns {Promise<string | undefined>} The cookie value, or `undefined` if the cookie is not set.
- */
-async function getCookieValue(context, name) {
-  const cookies = await context.cookies();
-
-  return cookies.find((cookie) => cookie.name === name)?.value;
-}
+const EMPTY_BASKET_COUNT = '0';
 
 test.describe('Init (Popups)', () => {
   test('Popups are shown again until confirmed and are not shown after being dismissed', async ({
     page,
     context,
   }) => {
-    const productsPage = new ProductsPage(page);
+    const basePage = new BasePage(page);
 
-    await productsPage.open();
-    await expect(productsPage.welcomeTitle).toBeVisible();
+    await basePage.open();
+    await expect(basePage.welcomeTitle).toBeVisible();
 
-    await page.keyboard.press('Escape');
-    await expect(productsPage.welcomeTitle).toBeHidden();
+    await page.keyboard.press(KEYS.ESCAPE);
+    await expect(basePage.welcomeTitle).toBeHidden();
     expect(
-      await getCookieValue(context, 'welcomebanner_status'),
+      await getCookieValue(context, WELCOME_BANNER_COOKIE),
     ).toBeUndefined();
 
     await page.reload();
-    await expect(productsPage.welcomeTitle).toBeVisible();
+    await expect(basePage.welcomeTitle).toBeVisible();
 
-    await productsPage.closeWelcomeButton.click();
-    await expect(productsPage.welcomeTitle).toBeHidden();
+    await basePage.closeWelcomeBanner();
+    await expect(basePage.welcomeTitle).toBeHidden();
     await expect
-      .poll(() => getCookieValue(context, 'welcomebanner_status'))
-      .toBe('dismiss');
-    await expect(productsPage.cookieBannerText).toBeVisible();
+      .poll(() => getCookieValue(context, WELCOME_BANNER_COOKIE))
+      .toBe(DISMISSED_COOKIE_VALUE);
+    await expect(basePage.cookieBannerText).toBeVisible();
 
     await page.reload();
-    await expect(productsPage.cookieBannerText).toBeVisible();
+    await expect(basePage.cookieBannerText).toBeVisible();
     expect(
-      await getCookieValue(context, 'cookieconsent_status'),
+      await getCookieValue(context, COOKIE_CONSENT_COOKIE),
     ).toBeUndefined();
 
-    await productsPage.acceptCookiesButton.click();
-    await expect(productsPage.cookieBannerText).toBeHidden();
+    await basePage.acceptCookies();
+    await expect(basePage.cookieBannerText).toBeHidden();
     await expect
-      .poll(() => getCookieValue(context, 'cookieconsent_status'))
-      .toBe('dismiss');
+      .poll(() => getCookieValue(context, COOKIE_CONSENT_COOKIE))
+      .toBe(DISMISSED_COOKIE_VALUE);
 
     await page.reload();
-    await expect(productsPage.welcomeTitle).toBeHidden();
-    await expect(productsPage.cookieBannerText).toBeHidden();
-    await expect(productsPage.basketCounter).toHaveText('0');
-    await productsPage.openSidenav();
-    await expect(productsPage.sidenavTitle).toBeVisible();
+    await expect(basePage.basketCounter).toHaveText(EMPTY_BASKET_COUNT);
+    await expect(basePage.welcomeTitle).toBeHidden();
+    await expect(basePage.cookieBannerText).toBeHidden();
+    await basePage.openSidenav();
+    await expect(basePage.sidenavTitle).toBeVisible();
   });
 });

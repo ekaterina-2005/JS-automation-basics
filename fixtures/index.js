@@ -1,10 +1,10 @@
 // @ts-check
 
-import { randomUUID } from 'node:crypto';
 import { test as base, expect } from '@playwright/test';
 import { BasePage } from '../pages/BasePage.js';
 import { LoginPage } from '../pages/LoginPage.js';
 import { RegistrationPage } from '../pages/RegistrationPage.js';
+import { createUniqueEmail } from '../src/utils/validators.js';
 import {
   TEST_EMAIL_PREFIX,
   TEST_EMAIL_DOMAIN,
@@ -40,7 +40,7 @@ export const test = /** @type {typeof base.extend<Fixtures>} */ (base.extend)({
     const registrationPage = new RegistrationPage(dismissedPage);
     // A new user for each test
     const user = {
-      email: `${TEST_EMAIL_PREFIX}${randomUUID()}${TEST_EMAIL_DOMAIN}`,
+      email: createUniqueEmail(TEST_EMAIL_PREFIX, TEST_EMAIL_DOMAIN),
       password: TEST_USER_PASSWORD,
     };
 

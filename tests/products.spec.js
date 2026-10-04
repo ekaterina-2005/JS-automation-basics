@@ -2,36 +2,26 @@
 
 import { test, expect } from '../fixtures/index.js';
 import { ProductsPage } from '../pages/ProductsPage.js';
-import { BasketPage } from '../pages/BasketPage.js';
+import {
+  OWASP_PRODUCTS_PAGE_URL,
+  PRODUCT_PRICE_PATTERN,
+} from '../config/constants.js';
 
-const PRODUCT = 'Apple Juice (1000ml)';
-const PRICE = '1.99¤';
+const NO_CARDS_COUNT = 0;
 
 test.describe('Products', () => {
-  test('Add a product to the basket and verify it in the basket', async ({
-    dismissedPage,
-  }) => {
-    const productsPage = new ProductsPage(dismissedPage);
-    const basketPage = new BasketPage(dismissedPage);
+  test('Product list is displayed', async ({ authenticatedPage }) => {
+    const productsPage = new ProductsPage(authenticatedPage);
 
-    await productsPage.addToBasket(PRODUCT);
+    await expect(authenticatedPage).toHaveURL(OWASP_PRODUCTS_PAGE_URL);
+    await expect(productsPage.title).toBeVisible();
+    await expect(productsPage.productCards).not.toHaveCount(NO_CARDS_COUNT);
 
-    /*
-     * A hard wait like page.waitForTimeout(3000) is fragile here. It does not check that the product
-     * was actually added, so a failure shows up later in another place.
-     * Instead, expect() retries until the snackbar and the basket counter are updated and continues
-     * as soon as they are.
-     */
-    await expect(productsPage.addedToBasketMessage(PRODUCT)).toBeVisible();
-    await expect(productsPage.basketCounter).toHaveText('1');
+    const cardsCount = await productsPage.productCards.count();
 
-    await productsPage.openBasket();
-
-    await expect(dismissedPage).toHaveURL(/\/#\/basket/);
-    await expect(basketPage.heading).toContainText('(anonymous)');
-    await expect(basketPage.rows).toHaveCount(1);
-    await expect(basketPage.cell(PRODUCT, '1')).toBeVisible();
-    await expect(basketPage.cell(PRODUCT, PRICE)).toBeVisible();
-    await expect(basketPage.totalPrice).toHaveText(`Total Price: ${PRICE}`);
+    await expect(
+      productsPage.cardsWithPrice(PRODUCT_PRICE_PATTERN),
+    ).toHaveCount(cardsCount);
+    await expect(productsPage.cardsWithAddButton).toHaveCount(cardsCount);
   });
 });

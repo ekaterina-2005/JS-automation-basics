@@ -28,15 +28,23 @@ export class BasePage {
 
     // Top toolbar
     this.openSidenavButton = page.getByRole('button', { name: 'Open Sidenav' });
-    this.sidenavTitle = page.getByRole('heading', { name: 'OWASP Juice Shop' });
+    this.sidenavTitle = page.getByRole('heading', {
+      name: 'OWASP Juice Shop',
+      exact: true,
+    });
     this.accountButton = page.getByRole('button', {
       name: 'Show/hide account menu',
     });
     this.loginMenuItem = page.getByRole('menuitem', {
       name: 'Go to login page',
     });
+    this.logoutMenuItem = page.getByRole('menuitem', { name: 'Logout' });
     this.basketButton = page.getByRole('button', {
       name: 'Show the shopping cart',
+    });
+    this.closeSnackbarButton = page.getByRole('button', {
+      name: 'X',
+      exact: true,
     });
     // The counter has no role or label, so it is found by its CSS class inside the basket button
     this.basketCounter = this.basketButton.locator('.fa-layers-counter');
@@ -50,6 +58,24 @@ export class BasePage {
    */
   async open(path = '/') {
     await this.page.goto(path);
+  }
+
+  /**
+   * Closes the Welcome banner with its "Dismiss" button.
+   *
+   * @returns {Promise<void>} Resolves when the button is clicked.
+   */
+  async closeWelcomeBanner() {
+    await this.closeWelcomeButton.click();
+  }
+
+  /**
+   * Accepts cookies with the "Me want it!" button of the cookie banner.
+   *
+   * @returns {Promise<void>} Resolves when the button is clicked.
+   */
+  async acceptCookies() {
+    await this.acceptCookiesButton.click();
   }
 
   /**
@@ -72,13 +98,49 @@ export class BasePage {
   }
 
   /**
+   * Opens the account menu with the "Account" button of the toolbar.
+   *
+   * @returns {Promise<void>} Resolves when the button is clicked.
+   */
+  async openAccountMenu() {
+    await this.accountButton.click();
+  }
+
+  /**
+   * Clicks the "Login" item of the opened account menu.
+   *
+   * @returns {Promise<void>} Resolves when the menu item is clicked.
+   */
+  async selectLoginMenuItem() {
+    await this.loginMenuItem.click();
+  }
+
+  /**
    * Opens the Login page through the toolbar: Account > Login.
    *
    * @returns {Promise<void>} Resolves when the "Login" menu item is clicked.
    */
   async goToLogin() {
-    await this.accountButton.click();
-    await this.loginMenuItem.click();
+    await this.openAccountMenu();
+    await this.selectLoginMenuItem();
+  }
+
+  /**
+   * Clicks the "Logout" item of the opened account menu.
+   *
+   * @returns {Promise<void>} Resolves when the menu item is clicked.
+   */
+  async selectLogoutMenuItem() {
+    await this.logoutMenuItem.click();
+  }
+
+  /**
+   * Closes the snackbar with its "X" button.
+   *
+   * @returns {Promise<void>} Resolves when the button is clicked.
+   */
+  async closeSnackbar() {
+    await this.closeSnackbarButton.click();
   }
 
   /**

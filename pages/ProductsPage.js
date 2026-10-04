@@ -7,6 +7,31 @@ import { BasePage } from './BasePage.js';
  */
 export class ProductsPage extends BasePage {
   /**
+   * Creates the page object and defines the locators of the product list.
+   *
+   * @param {import('@playwright/test').Page} page - The Playwright page of the current test.
+   */
+  constructor(page) {
+    super(page);
+
+    this.title = page.getByText('All Products', { exact: true });
+    this.productCards = page.getByRole('article');
+    this.cardsWithAddButton = this.productCards.filter({
+      has: page.getByRole('button', { name: 'Add to Basket' }),
+    });
+  }
+
+  /**
+   * Finds the product cards that contain a price.
+   *
+   * @param {RegExp} pricePattern - The pattern of a price with the currency sign.
+   * @returns {import('@playwright/test').Locator} The locator of the cards with a matching price.
+   */
+  cardsWithPrice(pricePattern) {
+    return this.productCards.filter({ hasText: pricePattern });
+  }
+
+  /**
    * Finds a product card by the product name. The name is the `alt` of the product `img`.
    *
    * @param {string} name - The exact full product name.

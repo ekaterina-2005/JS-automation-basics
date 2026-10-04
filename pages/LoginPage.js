@@ -27,6 +27,26 @@ export class LoginPage extends BasePage {
   }
 
   /**
+   * Fills the "Email" field of the login form.
+   *
+   * @param {string} email - The value for the "Email" field.
+   * @returns {Promise<void>} Resolves when the field is filled.
+   */
+  async fillEmail(email) {
+    await this.emailInput.fill(email);
+  }
+
+  /**
+   * Fills the "Password" field of the login form.
+   *
+   * @param {string} password - The value for the "Password" field.
+   * @returns {Promise<void>} Resolves when the field is filled.
+   */
+  async fillPassword(password) {
+    await this.passwordInput.fill(password);
+  }
+
+  /**
    * Fills the login form without submitting it.
    *
    * @param {string} email - The value for the "Email" field.
@@ -34,8 +54,8 @@ export class LoginPage extends BasePage {
    * @returns {Promise<void>} Resolves when both fields are filled.
    */
   async fillCredentials(email, password) {
-    await this.emailInput.fill(email);
-    await this.passwordInput.fill(password);
+    await this.fillEmail(email);
+    await this.fillPassword(password);
   }
 
   /**
