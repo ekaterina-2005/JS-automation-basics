@@ -1,15 +1,15 @@
 // @ts-check
 
-import { test, expect } from '../fixtures/index.js';
-import { ProductsPage } from '../pages/ProductsPage.js';
-import { BasketPage } from '../pages/BasketPage.js';
+import { test, expect } from '../../fixtures/index.js';
+import { ProductsPage } from '../../pages/ProductsPage.js';
+import { BasketPage } from '../../pages/BasketPage.js';
 import {
   EMPTY_BASKET_PRICE,
   GUEST_BASKET_OWNER,
   OWASP_BASKET_PAGE_URL,
   OWASP_CURRENCY,
   TOTAL_PRICE_LABEL,
-} from '../config/constants.js';
+} from '../../config/constants.js';
 
 const NO_ROWS_COUNT = 0;
 const ONE_ROW_COUNT = 1;
