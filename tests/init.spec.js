@@ -36,16 +36,16 @@ test.describe('Init (Popups)', () => {
     await expect
       .poll(() => getCookieValue(context, WELCOME_BANNER_COOKIE))
       .toBe(DISMISSED_COOKIE_VALUE);
-    await expect(basePage.cookieBannerText).toBeVisible();
+    await expect(basePage.cookieBanner).toBeVisible();
 
     await page.reload();
-    await expect(basePage.cookieBannerText).toBeVisible();
+    await expect(basePage.cookieBanner).toBeVisible();
     expect(
       await getCookieValue(context, COOKIE_CONSENT_COOKIE),
     ).toBeUndefined();
 
     await basePage.acceptCookies();
-    await expect(basePage.cookieBannerText).toBeHidden();
+    await expect(basePage.cookieBanner).toBeHidden();
     await expect
       .poll(() => getCookieValue(context, COOKIE_CONSENT_COOKIE))
       .toBe(DISMISSED_COOKIE_VALUE);
@@ -53,7 +53,7 @@ test.describe('Init (Popups)', () => {
     await page.reload();
     await expect(basePage.basketCounter).toHaveText(EMPTY_BASKET_COUNT);
     await expect(basePage.welcomeTitle).toBeHidden();
-    await expect(basePage.cookieBannerText).toBeHidden();
+    await expect(basePage.cookieBanner).toBeHidden();
     await basePage.openSidenav();
     await expect(basePage.sidenavTitle).toBeVisible();
   });

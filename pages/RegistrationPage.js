@@ -6,6 +6,8 @@ import { KEYS } from '../config/keycodes.js';
 import {
   OPEN_SELECT_TIMEOUT_MS,
   OPTION_VISIBLE_TIMEOUT_MS,
+  PASSWORD_MAX_LENGTH,
+  PASSWORD_MIN_LENGTH,
 } from '../config/constants.js';
 
 /**
@@ -44,7 +46,7 @@ export class RegistrationPage extends BasePage {
       hasText: 'Email address is not valid.',
     });
     this.passwordLengthError = this.validationErrors.filter({
-      hasText: 'Password must be 5-40 characters long.',
+      hasText: `Password must be ${PASSWORD_MIN_LENGTH}-${PASSWORD_MAX_LENGTH} characters long.`,
     });
     this.passwordsMismatchError = this.validationErrors.filter({
       hasText: 'Passwords do not match',

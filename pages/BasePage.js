@@ -19,9 +19,7 @@ export class BasePage {
     this.closeWelcomeButton = page.getByRole('button', {
       name: 'Close Welcome Banner',
     });
-    this.cookieBannerText = page.getByText(
-      'This website uses fruit cookies to ensure you get the juiciest tracking experience.',
-    );
+    this.cookieBanner = page.getByRole('dialog', { name: 'cookieconsent' });
     this.acceptCookiesButton = page.getByRole('button', {
       name: 'dismiss cookie message',
     });
