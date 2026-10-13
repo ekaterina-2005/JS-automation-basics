@@ -106,3 +106,11 @@ export const HTTP_STATUS = {
   UNAUTHORIZED: 401,
   FORBIDDEN: 403,
 };
+export const HEADERS = {
+  AUTHORIZATION: 'Authorization',
+  CONTENT_TYPE: 'Content-Type',
+};
+export const BEARER_PREFIX = 'Bearer';
+export const JSON_CONTENT_TYPE = 'application/json';
+export const SEARCH_QUERY = 'Apple';
+export const SEARCHED_ITEM_NAME = 'Apple Juice (1000ml)';

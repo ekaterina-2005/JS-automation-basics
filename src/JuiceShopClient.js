@@ -1,14 +1,13 @@
 // @ts-check
 
-import { ENDPOINTS, HTTP_STATUS } from '../config/constants.js';
+import {
+  ENDPOINTS,
+  HTTP_STATUS,
+  HEADERS,
+  BEARER_PREFIX,
+  JSON_CONTENT_TYPE,
+} from '../config/constants.js';
 import { InvalidInputError } from './utils/errors.js';
-
-const HEADERS = {
-  AUTHORIZATION: 'Authorization',
-  CONTENT_TYPE: 'Content-Type',
-};
-const BEARER_PREFIX = 'Bearer';
-const JSON_CONTENT_TYPE = 'application/json';
 
 /**
  * @typedef {object} ApiResponse
