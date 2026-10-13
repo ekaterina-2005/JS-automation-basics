@@ -112,5 +112,10 @@ export const HEADERS = {
 };
 export const BEARER_PREFIX = 'Bearer';
 export const JSON_CONTENT_TYPE = 'application/json';
+export const LOGIN_ERROR_TEXT = 'Invalid email or password.';
+export const NO_MATCH_QUERY = 'qwerty12345';
+export const SINGLE_QUOTE_QUERY = "'";
+export const LONG_QUERY_LENGTH = 300;
+export const NON_EXISTING_ID = 999999;
 export const SEARCH_QUERY = 'Apple';
 export const SEARCHED_ITEM_NAME = 'Apple Juice (1000ml)';
