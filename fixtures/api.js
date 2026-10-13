@@ -35,7 +35,7 @@ import {
  */
 /**
  * @typedef {object} ApiFixtures
- * @property {JuiceShopClient} api - The client for the shop with `baseURL` from playwright.config.js.
+ * @property {JuiceShopClient} api - The JuiceShopClient object with `baseURL` from playwright.config.js.
  * @property {ApiUser} user - A new registered and logged-in user, unique for each test.
  * @property {ApiUser} otherUser - A second new user, the owner of "another" basket.
  * @property {Product} product - The product found by the search.
@@ -44,7 +44,7 @@ import {
 /**
  * Registers a new user and logs in.
  *
- * @param {JuiceShopClient} api - The client for the shop.
+ * @param {JuiceShopClient} api - The JuiceShopClient object.
  * @returns {Promise<ApiUser>} The new user with the token and the basket id.
  */
 async function registerUser(api) {
@@ -54,7 +54,7 @@ async function registerUser(api) {
     password: TEST_USER_PASSWORD,
     passwordRepeat: TEST_USER_PASSWORD,
   });
-  expect(registration.status, 'User must be registered').toBe(
+  expect(registration.status, 'User must be registered.').toBe(
     HTTP_STATUS.CREATED,
   );
 
@@ -91,7 +91,7 @@ export const test = /** @type {typeof base.extend<ApiFixtures>} */ (
     const found = response.body.data.find(
       (/** @type {Product} */ item) => item.name === SEARCHED_ITEM_NAME,
     );
-    expect(found, `${SEARCHED_ITEM_NAME} must be found`).toBeDefined();
+    expect(found, `${SEARCHED_ITEM_NAME} must be found.`).toBeDefined();
 
     await use(found);
   },
@@ -101,7 +101,7 @@ export const test = /** @type {typeof base.extend<ApiFixtures>} */ (
       user.token,
       buildBasketItem(product.id, user.basketId),
     );
-    expect(response.status, 'Product must be added to the basket').toBe(
+    expect(response.status, 'Product must be added to the basket.').toBe(
       HTTP_STATUS.OK,
     );
 

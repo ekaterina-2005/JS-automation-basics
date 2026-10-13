@@ -2,6 +2,7 @@
 
 import { test, expect } from '@playwright/test';
 import { JSON_CONTENT_TYPE } from '../../config/constants.js';
+import Ajv from 'ajv';
 
 /**
  * Builds the body of POST for basket items.
@@ -21,8 +22,8 @@ export function buildBasketItem(productId, basketId, quantity = 1) {
  * @param {number} status - The HTTP status of the response.
  */
 export function expectClientError(status) {
-  expect(status, 'Status must be 4xx').toBeGreaterThanOrEqual(400);
-  expect(status, 'Status must be 4xx').toBeLessThan(500);
+  expect(status, 'Status must be 4xx.').toBeGreaterThanOrEqual(400);
+  expect(status, 'Status must be 4xx.').toBeLessThan(500);
 }
 
 /**
@@ -31,7 +32,7 @@ export function expectClientError(status) {
  * @param {number} status - The HTTP status of the response.
  */
 export function expectNoServerError(status) {
-  expect(status, 'Status must not be 5xx').toBeLessThan(500);
+  expect(status, 'Status must not be 5xx.').toBeLessThan(500);
 }
 
 /**
@@ -46,4 +47,22 @@ export async function attachResponse(name, response) {
     body: JSON.stringify(response, null, 2),
     contentType: JSON_CONTENT_TYPE,
   });
+}
+
+// allowUnionTypes lets a field have several types for `BasketId`
+const ajv = new Ajv({ allErrors: true, allowUnionTypes: true });
+
+/**
+ * Checks that the data matches a JSON Schema. On failure, the message lists every field that does not match.
+ *
+ * @param {object} schema - The JSON Schema.
+ * @param {unknown} data - The data to check, usually a response body.
+ */
+export function expectToMatchSchema(schema, data) {
+  const validate = ajv.compile(schema);
+  const valid = validate(data);
+
+  expect(valid, ajv.errorsText(validate.errors, { dataVar: 'body' })).toBe(
+    true,
+  );
 }

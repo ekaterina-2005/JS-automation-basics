@@ -114,7 +114,7 @@ export class JuiceShopClient {
     const response = await this.login({ email, password });
 
     if (response.status !== HTTP_STATUS.OK) {
-      throw new Error(`Login failed with HTTP ${response.status}`);
+      throw new Error(`Login failed with HTTP ${response.status}.`);
     }
 
     return response.body.authentication.token;
