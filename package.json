@@ -6,10 +6,12 @@
   "main": "index.js",
   "scripts": {
     "format": "prettier --write .",
-    "lint": "eslint config src tests pages fixtures playwright.config.js",
+    "lint": "eslint config src tests pages fixtures schemas playwright.config.js",
     "prepare": "husky",
     "test": "node src/index.js",
-    "test:all": "playwright test"
+    "test:all": "playwright test",
+    "test:ui": "playwright test --project=chromium --project=firefox --project=webkit",
+    "test:api": "playwright test --project=api"
   },
   "lint-staged": {
     "*.js": [
@@ -32,6 +34,7 @@
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.63.0",
     "@types/node": "^26.6.3",
+    "ajv": "^8.20.0",
     "eslint": "^10.11.0",
     "globals": "^17.12.0",
     "husky": "^9.1.7",

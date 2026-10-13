@@ -41,18 +41,27 @@ export default defineConfig({
 
   /* Configure projects for major browsers */
   projects: [
+    /* API tests use fetch and do not start a browser, so one project is enough */
+    {
+      name: 'api',
+      testDir: './tests/api',
+    },
+
     {
       name: 'chromium',
+      testDir: './tests/ui',
       use: { ...devices['Desktop Chrome'] },
     },
 
     {
       name: 'firefox',
+      testDir: './tests/ui',
       use: { ...devices['Desktop Firefox'] },
     },
 
     {
       name: 'webkit',
+      testDir: './tests/ui',
       use: { ...devices['Desktop Safari'] },
     },
 

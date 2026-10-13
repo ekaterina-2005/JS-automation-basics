@@ -1,14 +1,14 @@
 // @ts-check
 
 import { test, expect } from '@playwright/test';
-import { BasePage } from '../pages/BasePage.js';
-import { KEYS } from '../config/keycodes.js';
+import { BasePage } from '../../pages/BasePage.js';
+import { KEYS } from '../../config/keycodes.js';
 import {
   COOKIE_CONSENT_COOKIE,
   DISMISSED_COOKIE_VALUE,
   WELCOME_BANNER_COOKIE,
-} from '../config/constants.js';
-import { getCookieValue } from '../src/utils/cookies.js';
+} from '../../config/constants.js';
+import { getCookieValue } from '../../src/utils/cookies.js';
 
 const EMPTY_BASKET_COUNT = '0';
 
