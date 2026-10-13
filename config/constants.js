@@ -36,6 +36,7 @@ export const USER_URL = 'https://reqres.in/api/users/2';
 export const ALLOWED_STATUSES = [200];
 
 // OWASP Juice Shop
+// UI
 export const OWASP_LOGIN_PAGE_URL = '/#/login';
 export const OWASP_REGISTRATION_PAGE_URL = '/#/register';
 export const OWASP_PRODUCTS_PAGE_URL = '/#/search';
@@ -91,3 +92,17 @@ export const INVALID_CREDENTIALS = [
 export const EMPTY_BASKET_PRICE = `0${OWASP_CURRENCY}`;
 export const TOTAL_PRICE_LABEL = 'Total Price: ';
 export const GUEST_BASKET_OWNER = '(anonymous)';
+// API
+export const ENDPOINTS = {
+  REGISTRATION: 'api/Users/',
+  LOGIN: 'rest/user/login',
+  SEARCH: 'rest/products/search',
+  BASKET: 'rest/basket/',
+  BASKET_ITEMS: 'api/BasketItems/',
+};
+export const HTTP_STATUS = {
+  OK: 200,
+  CREATED: 201,
+  UNAUTHORIZED: 401,
+  FORBIDDEN: 403,
+};
