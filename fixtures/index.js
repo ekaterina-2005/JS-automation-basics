@@ -69,5 +69,5 @@ export const test = /** @type {typeof base.extend<Fixtures>} */ (base.extend)({
   },
 });
 
-// Re-exported so that specs need a single import.
+// Re-exported so that specs need a single import
 export { expect };

@@ -40,10 +40,9 @@ export class BasePage {
     this.basketButton = page.getByRole('button', {
       name: 'Show the shopping cart',
     });
-    this.closeSnackbarButton = page.getByRole('button', {
-      name: 'X',
-      exact: true,
-    });
+    this.closeSnackbarButton = page
+      .locator('.mat-mdc-snack-bar-container')
+      .getByRole('button', { name: 'X' });
     // The counter has no role or label, so it is found by its CSS class inside the basket button
     this.basketCounter = this.basketButton.locator('.fa-layers-counter');
   }

@@ -36,6 +36,7 @@ export const USER_URL = 'https://reqres.in/api/users/2';
 export const ALLOWED_STATUSES = [200];
 
 // OWASP Juice Shop
+// UI
 export const OWASP_LOGIN_PAGE_URL = '/#/login';
 export const OWASP_REGISTRATION_PAGE_URL = '/#/register';
 export const OWASP_PRODUCTS_PAGE_URL = '/#/search';
@@ -91,3 +92,30 @@ export const INVALID_CREDENTIALS = [
 export const EMPTY_BASKET_PRICE = `0${OWASP_CURRENCY}`;
 export const TOTAL_PRICE_LABEL = 'Total Price: ';
 export const GUEST_BASKET_OWNER = '(anonymous)';
+// API
+export const ENDPOINTS = {
+  REGISTRATION: 'api/Users/',
+  LOGIN: 'rest/user/login',
+  SEARCH: 'rest/products/search',
+  BASKET: 'rest/basket/',
+  BASKET_ITEMS: 'api/BasketItems/',
+};
+export const HTTP_STATUS = {
+  OK: 200,
+  CREATED: 201,
+  UNAUTHORIZED: 401,
+  FORBIDDEN: 403,
+};
+export const HEADERS = {
+  AUTHORIZATION: 'Authorization',
+  CONTENT_TYPE: 'Content-Type',
+};
+export const BEARER_PREFIX = 'Bearer';
+export const JSON_CONTENT_TYPE = 'application/json';
+export const LOGIN_ERROR_TEXT = 'Invalid email or password.';
+export const NO_MATCH_QUERY = 'qwerty12345';
+export const SINGLE_QUOTE_QUERY = "'";
+export const LONG_QUERY_LENGTH = 300;
+export const NON_EXISTING_ID = 999999;
+export const SEARCH_QUERY = 'Apple';
+export const SEARCHED_ITEM_NAME = 'Apple Juice (1000ml)';

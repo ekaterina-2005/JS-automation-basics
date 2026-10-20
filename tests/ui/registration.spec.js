@@ -1,9 +1,9 @@
 // @ts-check
 
-import { test, expect } from '../fixtures/index.js';
-import { RegistrationPage } from '../pages/RegistrationPage.js';
-import { LoginPage } from '../pages/LoginPage.js';
-import { createUniqueEmail } from '../src/utils/validators.js';
+import { test, expect } from '../../fixtures/index.js';
+import { RegistrationPage } from '../../pages/RegistrationPage.js';
+import { LoginPage } from '../../pages/LoginPage.js';
+import { createUniqueEmail } from '../../src/utils/validators.js';
 import {
   INVALID_EMAIL,
   MASKED_INPUT_TYPE,
@@ -16,7 +16,7 @@ import {
   TEST_USER_PASSWORD,
   TOO_LONG_PASSWORD,
   TOO_SHORT_PASSWORD,
-} from '../config/constants.js';
+} from '../../config/constants.js';
 
 test.describe('Registration', () => {
   /** @type {RegistrationPage} */

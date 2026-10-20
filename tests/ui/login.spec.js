@@ -1,8 +1,8 @@
 // @ts-check
 
-import { test, expect } from '../fixtures/index.js';
-import { LoginPage } from '../pages/LoginPage.js';
-import { getCookieValue } from '../src/utils/cookies.js';
+import { test, expect } from '../../fixtures/index.js';
+import { LoginPage } from '../../pages/LoginPage.js';
+import { getCookieValue } from '../../src/utils/cookies.js';
 import {
   ADMIN_EMAIL,
   ADMIN_PASSWORD,
@@ -11,7 +11,7 @@ import {
   OWASP_LOGIN_PAGE_URL,
   OWASP_PRODUCTS_PAGE_URL,
   TOKEN_COOKIE,
-} from '../config/constants.js';
+} from '../../config/constants.js';
 
 const EMPTY_VALUE = '';
 

@@ -1,3 +1,5 @@
+// @ts-check
+
 import 'dotenv/config';
 import { API_USERS, CONTEXT_TIMEOUT_MS } from '../config/constants.js';
 import { InvalidInputError } from './utils/errors.js';
@@ -40,6 +42,7 @@ export class ReqResClient {
 
     if (!response.ok) {
       const error = new Error(`HTTP ${response.status}`);
+      // @ts-ignore
       error.status = response.status;
       throw error;
     }
@@ -52,8 +55,10 @@ export class ReqResClient {
    *
    * @param {number|string} id - The unique identifier of the user.
    * @returns {Promise<{ data: { email: string, [key: string]: any } }>} A promise resolving to the user data.
+   * @throws {InvalidInputError} If valid `id` is not provided.
    */
   async getUser(id) {
+    // @ts-ignore
     if (!Number.isInteger(id) || id <= 0) {
       throw new InvalidInputError('User id must be provided.');
     }
@@ -68,6 +73,7 @@ export class ReqResClient {
    *
    * @param {Object} userData - The data for the new user.
    * @returns {Promise<Object>} A promise resolving to the created user's data.
+   * @throws {InvalidInputError} If valid `userData` is not provided.
    */
   async createUser(userData) {
     if (!userData || typeof userData !== 'object') {
@@ -78,6 +84,23 @@ export class ReqResClient {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-api-key': this.apiKey },
       body: JSON.stringify(userData),
+    });
+  }
+
+  /**
+   * Gets one page of the user list.
+   *
+   * @param {number} pageNumber - The page number.
+   * @returns {Promise<{ page: number, per_page: number, total: number, total_pages: number, data: Array<{ id: number, [key: string]: any }> }>} A promise resolving to the page.
+   * @throws {InvalidInputError} If valid `pageNumber` is not provided.
+   */
+  async getListOfUsers(pageNumber) {
+    if (!Number.isInteger(pageNumber) || pageNumber <= 0) {
+      throw new InvalidInputError('Page must be a positive integer.');
+    }
+
+    return this._request(`${API_USERS}?page=${pageNumber}`, {
+      headers: { 'x-api-key': this.apiKey },
     });
   }
 
