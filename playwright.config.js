@@ -1,5 +1,9 @@
 // @ts-check
 import { defineConfig, devices } from '@playwright/test';
+import { execSync } from 'child_process';
+
+// The container is created with `docker create`
+const JUICE_SHOP_CONTAINER = 'juice-shop';
 
 /**
  * Read environment variables from file.
@@ -8,6 +12,23 @@ import { defineConfig, devices } from '@playwright/test';
 // import dotenv from 'dotenv';
 // import path from 'path';
 // dotenv.config({ path: path.resolve(__dirname, '.env') });
+
+/*
+ * Only the main process stops the container, when the whole run is finished.
+ * Playwright stops only the `docker start` process, the container itself keeps running.
+ */
+if (!process.env.TEST_WORKER_INDEX) {
+  stopJuiceShop(); // Before the run
+  process.on('exit', stopJuiceShop); // After the run
+}
+
+function stopJuiceShop() {
+  try {
+    execSync(`docker stop -t 2 ${JUICE_SHOP_CONTAINER}`, { stdio: 'ignore' });
+  } catch {
+    // The container is already stopped
+  }
+}
 
 /**
  * @see https://playwright.dev/docs/test-configuration
@@ -24,7 +45,7 @@ export default defineConfig({
   /* All tests use one local server, 8 parallel browsers overload the machine */
   workers: process.env.CI ? 1 : 4,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: 'html',
+  reporter: [['html', { open: 'never' }]],
 
   /* Server can answer later than the default 5 seconds when several browsers run in parallel */
   expect: { timeout: 15000 },
@@ -87,9 +108,10 @@ export default defineConfig({
   ],
 
   /* Run your local dev server before starting the tests */
-  // webServer: {
-  //   command: 'npm run start',
-  //   url: 'http://localhost:3000',
-  //   reuseExistingServer: !process.env.CI,
-  // },
+  webServer: {
+    // Juice Shop creates its database again on every start, so each run begins without old test users
+    command: `docker start --attach ${JUICE_SHOP_CONTAINER}`,
+    url: 'http://localhost:3000',
+    reuseExistingServer: false,
+  },
 });
