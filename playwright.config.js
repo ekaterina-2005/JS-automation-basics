@@ -41,7 +41,7 @@ export default defineConfig({
 
   /* Configure projects for major browsers */
   projects: [
-    /* API tests use fetch and do not start a browser, so one project is enough */
+    /* API tests use request and do not start a browser, so one project is enough */
     {
       name: 'api',
       testDir: './tests/api',

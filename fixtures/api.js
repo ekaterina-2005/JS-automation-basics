@@ -72,8 +72,8 @@ async function registerUser(api) {
 export const test = /** @type {typeof base.extend<ApiFixtures>} */ (
   base.extend
 )({
-  api: async ({ baseURL }, use) => {
-    await use(new JuiceShopClient(baseURL));
+  api: async ({ request }, use) => {
+    await use(new JuiceShopClient(request));
   },
 
   // A new user for each test: first user

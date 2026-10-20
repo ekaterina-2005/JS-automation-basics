@@ -29,19 +29,19 @@ export class JuiceShopClient {
   /**
    * Initializes the JuiceShop API client.
    *
-   * @param {string | undefined} baseUrl - The URL from playwright.config.js.
-   * @throws {InvalidInputError} If the base URL is not a non-empty string.
+   * @param {import('@playwright/test').APIRequestContext} request - The request fixture of Playwright.
+   * @throws {InvalidInputError} If the request context `baseURL` is not provided.
    */
-  constructor(baseUrl) {
-    if (typeof baseUrl !== 'string' || baseUrl.trim() === '') {
-      throw new InvalidInputError('Base URL must be a non-empty string.');
+  constructor(request) {
+    if (!request) {
+      throw new InvalidInputError('APIRequestContext must be provided.');
     }
 
-    this.baseUrl = baseUrl;
+    this.request = request;
   }
 
   /**
-   * Core request method that wraps the native fetch API.
+   * Core request method that wraps the Playwright APIRequestContext.
    *
    * @private
    * @param {string} endpoint - The endpoint relative to the base URL.
@@ -49,8 +49,8 @@ export class JuiceShopClient {
    * @returns {Promise<ApiResponse>} The status and the body of the response.
    */
   async _request(endpoint, { method = 'GET', token, body, query } = {}) {
-    const url = new URL(endpoint, this.baseUrl);
-    url.search = new URLSearchParams(query ?? {}).toString();
+    // const url = new URL(endpoint, this.baseUrl);
+    // url.search = new URLSearchParams(query ?? {}).toString();
 
     /** @type {Record<string, string>} */
     const headers = {};
@@ -58,22 +58,30 @@ export class JuiceShopClient {
     if (token !== undefined) {
       headers[HEADERS.AUTHORIZATION] = `${BEARER_PREFIX} ${token}`;
     }
-    if (body !== undefined) {
-      headers[HEADERS.CONTENT_TYPE] = JSON_CONTENT_TYPE;
-    }
+    // if (body !== undefined) {
+    //   headers[HEADERS.CONTENT_TYPE] = JSON_CONTENT_TYPE;
+    // }
 
-    const response = await fetch(url, {
+    const response = await this.request.fetch(endpoint, {
       method,
       headers,
-      body: body === undefined ? undefined : JSON.stringify(body),
+      params: query, // replaces URLSearchParams
+      data: body, // an object is sent as JSON, Content-Type is set automatically
     });
+
     const text = await response.text();
     // A failed login answers with plain text, so the body is parsed only when it is JSON
-    const isJson = (response.headers.get(HEADERS.CONTENT_TYPE) ?? '').includes(
-      JSON_CONTENT_TYPE,
-    );
+    const isJson = (
+      response.headers()[HEADERS.CONTENT_TYPE.toLowerCase()] ?? ''
+    ).includes(JSON_CONTENT_TYPE);
+    // const isJson = (response.headers.get(HEADERS.CONTENT_TYPE) ?? '').includes(
+    //   JSON_CONTENT_TYPE,
+    // );
 
-    return { status: response.status, body: isJson ? JSON.parse(text) : text };
+    return {
+      status: response.status(),
+      body: isJson ? JSON.parse(text) : text,
+    };
   }
 
   /**
