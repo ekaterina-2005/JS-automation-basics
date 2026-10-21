@@ -1,8 +1,10 @@
 import js from '@eslint/js';
 import globals from 'globals';
-import { defineConfig } from 'eslint/config';
+import { defineConfig, globalIgnores } from 'eslint/config';
 
 export default defineConfig([
+  // ESLint ignores only node_modules and .git by default, it does not read .gitignore
+  globalIgnores(['playwright-report/', 'test-results/', 'blob-report/']),
   {
     files: ['**/*.{js,mjs,cjs}'],
     plugins: { js },

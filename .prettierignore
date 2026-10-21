@@ -1,0 +1,2 @@
+# Prettier automatically respects .gitignore, so reports and node_modules are already excluded.
+package-lock.json
