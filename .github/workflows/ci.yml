@@ -65,6 +65,7 @@ jobs:
 
   api:
     name: API tests
+    # api and ui run in parallel after lint
     needs: lint
     if: ${{ github.event_name != 'workflow_dispatch' || inputs.test_type == 'api' || inputs.test_type == 'all' }}
     runs-on: ubuntu-latest
@@ -119,10 +120,9 @@ jobs:
 
   ui:
     name: UI tests
-    # Sequential run lint -> api -> ui
-    needs: [lint, api]
-    # `api` can be skipped by the manual run with test_type = ui, by default a skipped `needs` job skips this job too
-    if: ${{ !cancelled() && needs.lint.result == 'success' && (needs.api.result == 'success' || needs.api.result == 'skipped') && (github.event_name != 'workflow_dispatch' || inputs.test_type == 'ui' || inputs.test_type == 'all') }}
+    # api and ui run in parallel after lint
+    needs: lint
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.test_type == 'ui' || inputs.test_type == 'all' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
