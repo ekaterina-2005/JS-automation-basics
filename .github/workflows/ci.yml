@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  # Every push to the main branch and to feature branches
+  push:
+    branches:
+      - main
+      - 'feature/**'
+  # A new PR into main and every new commit in it
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened]
+  # Nightly run (only from the default branch)
+  schedule:
+    - cron: '15 0 * * *'
+  # Manual run from the Actions tab
+  workflow_dispatch:
+    inputs:
+      test_type:
+        description: 'Type of tests to run'
+        type: choice
+        options:
+          - ui
+          - api
+          - all
+        required: true
+        default: 'all'
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: 24
+  # Git hooks are not needed on the runner
+  HUSKY: 0
+
+jobs:
+  lint:
+    name: Lint & format
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: ESLint
+        run: npm run lint
+
+      - name: Prettier
+        run: npm run format:check
