@@ -44,8 +44,8 @@ export default defineConfig({
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
   /* Opt out of parallel tests on CI. */
-  /* All tests use one local server, 8 parallel browsers overload the machine */
-  workers: process.env.CI ? 1 : 4,
+  /* CI: the runner has 4 vCPU. Locally: all tests use one local server, 8 parallel browsers overload the machine. */
+  workers: process.env.CI ? 2 : 4,
   /* CI: progress in the log + annotations in GitHub + HTML report for the artifact */
   reporter: process.env.CI
     ? [
