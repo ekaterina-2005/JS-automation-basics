@@ -42,7 +42,8 @@ env:
 jobs:
   lint:
     name: Lint & Format
-    runs-on: ubuntu-latest
+    # `env` is not available in `runs-on`, the value is shared with a YAML anchor (fixed runner image)
+    runs-on: &runner ubuntu-24.04
     timeout-minutes: 10
     steps:
       - name: Clone repository
@@ -68,7 +69,7 @@ jobs:
     # api and ui run in parallel after lint
     needs: lint
     if: ${{ github.event_name != 'workflow_dispatch' || inputs.test_type == 'api' || inputs.test_type == 'all' }}
-    runs-on: ubuntu-latest
+    runs-on: *runner
     timeout-minutes: 10
     env:
       # Not secret: a variable from Settings
@@ -123,7 +124,7 @@ jobs:
     # api and ui run in parallel after lint
     needs: lint
     if: ${{ github.event_name != 'workflow_dispatch' || inputs.test_type == 'ui' || inputs.test_type == 'all' }}
-    runs-on: ubuntu-latest
+    runs-on: *runner
     timeout-minutes: 10
     strategy:
       # By default - true, the failure of one job in a matrix cancels the others
