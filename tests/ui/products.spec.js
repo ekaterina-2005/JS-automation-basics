@@ -15,8 +15,7 @@ test.describe('Products', () => {
 
     await expect(authenticatedPage).toHaveURL(OWASP_PRODUCTS_PAGE_URL);
     await expect(productsPage.title).toBeVisible();
-    // Broken on purpose to check CI
-    await expect(productsPage.productCards).toHaveCount(NO_CARDS_COUNT);
+    await expect(productsPage.productCards).not.toHaveCount(NO_CARDS_COUNT);
 
     const cardsCount = await productsPage.productCards.count();
 
