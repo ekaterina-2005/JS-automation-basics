@@ -96,6 +96,23 @@ jobs:
       - name: Run API tests
         run: npm run test:api
 
+      - name: Upload HTML report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report-api
+          path: playwright-report/
+          retention-days: 7
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-results-api
+          path: test-results/
+          if-no-files-found: ignore
+          retention-days: 7
+
       - name: Juice Shop logs
         if: failure()
         run: docker logs --tail 200 juice-shop
@@ -133,6 +150,23 @@ jobs:
 
       - name: Run UI tests
         run: npm run test:ui
+
+      - name: Upload HTML report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report-ui
+          path: playwright-report/
+          retention-days: 7
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-results-ui
+          path: test-results/
+          if-no-files-found: ignore
+          retention-days: 7
 
       - name: Juice Shop logs
         if: failure()
