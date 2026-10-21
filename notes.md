@@ -5,7 +5,6 @@ Stand: http://localhost:3000, Juice Shop.
 Source: Chrome DevTools, Network tab.
 Token is written as <token>.
 
-
 ## Registration
 
 Method: POST
@@ -47,7 +46,6 @@ Response body:
         "deletedAt": null
       }
     }
-
 
 ## Login
 
@@ -91,7 +89,6 @@ Response body (plain text, not JSON):
 
     Invalid email or password.
 
-
 ## Products
 
 Method: GET
@@ -124,7 +121,6 @@ Response body (46 products, the first one is shown):
 Note: the UI always sends an empty q and filters the list in the browser.
 Typing "Apple" in the search field sends no request.
 
-
 ## Add to Basket
 
 Method: POST
@@ -156,7 +152,6 @@ Response body:
     }
 
 Note: data.id is the id of the basket item. It is used to change or delete it.
-
 
 ## Basket
 
@@ -204,7 +199,6 @@ Response body:
 
 Note: the quantity is in Products[i].BasketItem.quantity.
 
-
 ## Change quantity
 
 Sent when the same product is added again or "+" / "-" is pressed in the basket.
@@ -235,7 +229,6 @@ Response body:
       }
     }
 
-
 ## Delete from basket
 
 Method: DELETE
@@ -252,7 +245,6 @@ Response body:
       "status": "success",
       "data": {}
     }
-
 
 ## Logout
 
@@ -284,7 +276,6 @@ Response body:
 
 Note: this is the only request sent on logout. The token is deleted in the browser, the server is not asked to cancel it.
 
-
 ## Forgot password: security question
 
 Sent when the email is typed on the Forgot Password page.
@@ -307,7 +298,6 @@ Response body:
         "updatedAt": "2026-10-11T19:43:22.347Z"
       }
     }
-
 
 ## Forgot password: reset password
 

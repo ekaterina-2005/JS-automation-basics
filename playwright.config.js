@@ -1,23 +1,23 @@
 // @ts-check
+import 'dotenv/config';
 import { defineConfig, devices } from '@playwright/test';
 import { execSync } from 'child_process';
 
 // The container is created with `docker create`
 const JUICE_SHOP_CONTAINER = 'juice-shop';
+const BASE_URL = process.env.BASE_URL ?? 'http://localhost:3000';
 
-/**
- * Read environment variables from file.
- * https://github.com/motdotla/dotenv
+/*
+ * true: Playwright starts the local container itself.
+ * false: CI starts Juice Shop and waits until it is ready, Playwright does not restart any container.
  */
-// import dotenv from 'dotenv';
-// import path from 'path';
-// dotenv.config({ path: path.resolve(__dirname, '.env') });
+const LOCAL_START = process.env.LOCAL_START !== 'false'; // By default LOCAL_START = true
 
 /*
  * Only the main process stops the container, when the whole run is finished.
  * Playwright stops only the `docker start` process, the container itself keeps running.
  */
-if (!process.env.TEST_WORKER_INDEX) {
+if (LOCAL_START && !process.env.TEST_WORKER_INDEX) {
   stopJuiceShop(); // Before the run
   process.on('exit', stopJuiceShop); // After the run
 }
@@ -35,6 +35,8 @@ function stopJuiceShop() {
  */
 export default defineConfig({
   testDir: './tests',
+  /* Screenshots, traces and other files of failed tests */
+  outputDir: 'test-results',
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
@@ -44,8 +46,17 @@ export default defineConfig({
   /* Opt out of parallel tests on CI. */
   /* All tests use one local server, 8 parallel browsers overload the machine */
   workers: process.env.CI ? 1 : 4,
-  /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: [['html', { open: 'never' }]],
+  /* CI: progress in the log + annotations in GitHub + HTML report for the artifact */
+  reporter: process.env.CI
+    ? [
+        ['list'],
+        ['github'],
+        ['html', { open: 'never', outputFolder: 'playwright-report' }],
+      ]
+    : [
+        ['list'],
+        ['html', { open: 'never', outputFolder: 'playwright-report' }],
+      ],
 
   /* Server can answer later than the default 5 seconds when several browsers run in parallel */
   expect: { timeout: 15000 },
@@ -54,10 +65,11 @@ export default defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('')`. */
-    baseURL: process.env.BASE_URL ?? 'http://localhost:3000',
+    baseURL: BASE_URL,
 
-    /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: 'on-first-retry',
+    /* Kept only for failed tests */
+    trace: 'retain-on-failure',
+    screenshot: 'only-on-failure',
   },
 
   /* Configure projects for major browsers */
@@ -108,10 +120,14 @@ export default defineConfig({
   ],
 
   /* Run your local dev server before starting the tests */
-  webServer: {
-    // Juice Shop creates its database again on every start, so each run begins without old test users
-    command: `docker start --attach ${JUICE_SHOP_CONTAINER}`,
-    url: 'http://localhost:3000',
-    reuseExistingServer: false,
-  },
+  webServer: LOCAL_START
+    ? {
+        // Juice Shop creates its database again on every start, so each run begins without old test users
+        command: `docker start --attach ${JUICE_SHOP_CONTAINER}`,
+        url: BASE_URL,
+        reuseExistingServer: false,
+        // Hides [WebServer] Error ... in the console
+        stderr: 'ignore',
+      }
+    : undefined,
 });
