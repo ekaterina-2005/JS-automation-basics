@@ -17,7 +17,7 @@ test.describe('Products', () => {
     await expect(productsPage.title).toBeVisible();
     await expect(productsPage.productCards).not.toHaveCount(NO_CARDS_COUNT);
 
-    let cardsCount = await productsPage.productCards.count();
+    const cardsCount = await productsPage.productCards.count();
 
     await expect(
       productsPage.cardsWithPrice(PRODUCT_PRICE_PATTERN),
