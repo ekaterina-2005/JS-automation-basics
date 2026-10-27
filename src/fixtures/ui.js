@@ -6,6 +6,7 @@ import { LoginPage } from '../pages/LoginPage.js';
 import { RegistrationPage } from '../pages/RegistrationPage.js';
 import { createUniqueEmail } from '../utils/validators.js';
 import {
+  JSON_CONTENT_TYPE,
   TEST_EMAIL_PREFIX,
   TEST_EMAIL_DOMAIN,
   TEST_USER_PASSWORD,
@@ -35,7 +36,7 @@ export const test = /** @type {typeof base.extend<Fixtures>} */ (base.extend)({
     await use(page);
   },
 
-  user: async ({ dismissedPage }, use) => {
+  user: async ({ dismissedPage }, use, testInfo) => {
     const loginPage = new LoginPage(dismissedPage);
     const registrationPage = new RegistrationPage(dismissedPage);
     // A new user for each test
@@ -53,6 +54,12 @@ export const test = /** @type {typeof base.extend<Fixtures>} */ (base.extend)({
     await registrationPage.register();
     await expect(registrationPage.successMessage).toBeVisible();
     await expect(dismissedPage).toHaveURL(OWASP_LOGIN_PAGE_URL);
+
+    // The failure can be reproduced with the same data on one's own
+    await testInfo.attach('User data', {
+      body: JSON.stringify(user, null, 2),
+      contentType: JSON_CONTENT_TYPE,
+    });
 
     await use(user);
   },
