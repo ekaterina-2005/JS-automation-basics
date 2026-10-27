@@ -100,40 +100,48 @@ test.describe('Basket', () => {
   });
 
   test('Change the quantity with "-" and "+": not below 1', async () => {
-    await addProductToBasket(productsPage, DOUBLE_QUANTITY);
-    await productsPage.openBasket();
+    await test.step('Put the product into the basket twice', async () => {
+      await addProductToBasket(productsPage, DOUBLE_QUANTITY);
+      await productsPage.openBasket();
 
-    await expect(
-      basketPage.cell(BASKET_PRODUCT, String(DOUBLE_QUANTITY)),
-    ).toBeVisible();
+      await expect(
+        basketPage.cell(BASKET_PRODUCT, String(DOUBLE_QUANTITY)),
+      ).toBeVisible();
+    });
 
-    await basketPage.decreaseQuantity(BASKET_PRODUCT);
+    await test.step('Decrease the quantity from 2 to 1', async () => {
+      await basketPage.decreaseQuantity(BASKET_PRODUCT);
 
-    await expect(
-      basketPage.cell(BASKET_PRODUCT, String(SINGLE_QUANTITY)),
-    ).toBeVisible();
-    await expect(basketPage.totalPrice).toHaveText(
-      `${TOTAL_PRICE_LABEL}${BASKET_PRODUCT_PRICE}`,
-    );
+      await expect(
+        basketPage.cell(BASKET_PRODUCT, String(SINGLE_QUANTITY)),
+      ).toBeVisible();
+      await expect(basketPage.totalPrice).toHaveText(
+        `${TOTAL_PRICE_LABEL}${BASKET_PRODUCT_PRICE}`,
+      );
+    });
 
-    await basketPage.decreaseQuantity(BASKET_PRODUCT);
+    await test.step('Decrease at quantity 1: the quantity stays 1', async () => {
+      await basketPage.decreaseQuantity(BASKET_PRODUCT);
 
-    await expect(basketPage.rows).toHaveCount(ONE_ROW_COUNT);
-    await expect(
-      basketPage.cell(BASKET_PRODUCT, String(SINGLE_QUANTITY)),
-    ).toBeVisible();
-    await expect(basketPage.totalPrice).toHaveText(
-      `${TOTAL_PRICE_LABEL}${BASKET_PRODUCT_PRICE}`,
-    );
+      await expect(basketPage.rows).toHaveCount(ONE_ROW_COUNT);
+      await expect(
+        basketPage.cell(BASKET_PRODUCT, String(SINGLE_QUANTITY)),
+      ).toBeVisible();
+      await expect(basketPage.totalPrice).toHaveText(
+        `${TOTAL_PRICE_LABEL}${BASKET_PRODUCT_PRICE}`,
+      );
+    });
 
-    await basketPage.increaseQuantity(BASKET_PRODUCT);
+    await test.step('Increase the quantity back to 2', async () => {
+      await basketPage.increaseQuantity(BASKET_PRODUCT);
 
-    await expect(
-      basketPage.cell(BASKET_PRODUCT, String(DOUBLE_QUANTITY)),
-    ).toBeVisible();
-    await expect(basketPage.totalPrice).toHaveText(
-      `${TOTAL_PRICE_LABEL}${BASKET_PRODUCT_DOUBLE_PRICE}`,
-    );
+      await expect(
+        basketPage.cell(BASKET_PRODUCT, String(DOUBLE_QUANTITY)),
+      ).toBeVisible();
+      await expect(basketPage.totalPrice).toHaveText(
+        `${TOTAL_PRICE_LABEL}${BASKET_PRODUCT_DOUBLE_PRICE}`,
+      );
+    });
   });
 
   test('Delete the product: the basket becomes empty', async () => {
