@@ -4,7 +4,7 @@ import { test as base, expect } from '@playwright/test';
 import { BasePage } from '../pages/BasePage.js';
 import { LoginPage } from '../pages/LoginPage.js';
 import { RegistrationPage } from '../pages/RegistrationPage.js';
-import { createUniqueEmail } from '../src/utils/validators.js';
+import { createUniqueEmail } from '../utils/validators.js';
 import {
   TEST_EMAIL_PREFIX,
   TEST_EMAIL_DOMAIN,
@@ -12,7 +12,7 @@ import {
   TEST_SECURITY_ANSWER,
   OWASP_LOGIN_PAGE_URL,
   OWASP_PRODUCTS_PAGE_URL,
-} from '../config/constants.js';
+} from '../../config/constants.js';
 
 /**
  * @typedef {object} User

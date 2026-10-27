@@ -1,7 +1,7 @@
 // @ts-check
 
 import { test, expect } from '@playwright/test';
-import { ReqResClient } from '../../src/ReqResClient.js';
+import { ReqResClient } from '../../src/api/ReqResClient.js';
 
 const FIRST_PAGE = 1;
 

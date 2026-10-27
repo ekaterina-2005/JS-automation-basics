@@ -1,7 +1,7 @@
 // @ts-check
 
 import { test, expect } from '@playwright/test';
-import { BasePage } from '../../pages/BasePage.js';
+import { BasePage } from '../../src/pages/BasePage.js';
 import { KEYS } from '../../config/keycodes.js';
 import {
   COOKIE_CONSENT_COOKIE,

@@ -1,8 +1,8 @@
 // @ts-check
 
-import { test, expect } from '../../fixtures/index.js';
-import { ProductsPage } from '../../pages/ProductsPage.js';
-import { BasketPage } from '../../pages/BasketPage.js';
+import { test, expect } from '../../src/fixtures/ui.js';
+import { ProductsPage } from '../../src/pages/ProductsPage.js';
+import { BasketPage } from '../../src/pages/BasketPage.js';
 import {
   EMPTY_BASKET_PRICE,
   GUEST_BASKET_OWNER,

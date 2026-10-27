@@ -28,7 +28,7 @@ import {
   aggregateModern,
 } from './utils/modernMethods.js';
 import { normalizeConfig } from './utils/configNormalizer.js';
-import { ReqResClient } from './ReqResClient.js';
+import { ReqResClient } from '../src/api/ReqResClient.js';
 import {
   pollUntilReady,
   withLogging,

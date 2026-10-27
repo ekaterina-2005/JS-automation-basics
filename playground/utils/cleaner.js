@@ -1,4 +1,4 @@
-import { InvalidInputError } from './errors.js';
+import { InvalidInputError } from '../../src/utils/errors.js';
 
 /**
  * Parses a price string and returns a clean number.

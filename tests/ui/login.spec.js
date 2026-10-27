@@ -1,7 +1,7 @@
 // @ts-check
 
-import { test, expect } from '../../fixtures/index.js';
-import { LoginPage } from '../../pages/LoginPage.js';
+import { test, expect } from '../../src/fixtures/ui.js';
+import { LoginPage } from '../../src/pages/LoginPage.js';
 import { getCookieValue } from '../../src/utils/cookies.js';
 import {
   ADMIN_EMAIL,

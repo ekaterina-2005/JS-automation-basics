@@ -1,8 +1,8 @@
 // @ts-check
 
 import 'dotenv/config';
-import { API_USERS, CONTEXT_TIMEOUT_MS } from '../config/constants.js';
-import { InvalidInputError } from './utils/errors.js';
+import { API_USERS, CONTEXT_TIMEOUT_MS } from '../../config/constants.js';
+import { InvalidInputError } from '../utils/errors.js';
 
 /**
  * Client class for interacting with the ReqRes API.
@@ -12,7 +12,7 @@ export class ReqResClient {
    * Initializes the ReqRes API client.
    * Reads the base URL and API key from environment variables.
    *
-   * @throws {Error} If API_BASE_URL is not provided in the environment.
+   * @throws {Error} If API_BASE_URL or REQRES_API_KEY is missing in the environment.
    */
   constructor() {
     if (!process.env.API_BASE_URL) {

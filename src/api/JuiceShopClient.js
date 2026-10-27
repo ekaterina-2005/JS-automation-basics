@@ -6,8 +6,8 @@ import {
   HEADERS,
   BEARER_PREFIX,
   JSON_CONTENT_TYPE,
-} from '../config/constants.js';
-import { InvalidInputError } from './utils/errors.js';
+} from '../../config/constants.js';
+import { InvalidInputError } from '../utils/errors.js';
 
 /**
  * @typedef {object} ApiResponse
@@ -30,7 +30,7 @@ export class JuiceShopClient {
    * Initializes the JuiceShop API client.
    *
    * @param {import('@playwright/test').APIRequestContext} request - The request fixture of Playwright.
-   * @throws {InvalidInputError} If the request context `baseURL` is not provided.
+   * @throws {InvalidInputError} If the request context is not provided.
    */
   constructor(request) {
     if (!request) {

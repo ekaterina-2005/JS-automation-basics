@@ -1,6 +1,6 @@
 // @ts-check
 
-import { test, expect } from '../../fixtures/api.js';
+import { test, expect } from '../../src/fixtures/api.js';
 import { loginSchema } from '../../schemas/auth.schema.js';
 import {
   expectClientError,

@@ -9,10 +9,10 @@
     "format:check": "prettier --check .",
     "lint": "eslint .",
     "prepare": "husky",
-    "test": "node src/index.js",
-    "test:all": "playwright test",
+    "test": "playwright test",
     "test:ui": "playwright test tests/ui",
-    "test:api": "playwright test --project=api"
+    "test:api": "playwright test --project=api --project=external",
+    "playground": "node playground/index.js"
   },
   "lint-staged": {
     "*.js": [

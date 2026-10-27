@@ -1,4 +1,4 @@
-import { InvalidInputError } from './errors.js';
+import { InvalidInputError } from '../../src/utils/errors.js';
 import { CURRENCY, ROLE } from '../../config/constants.js';
 
 /**

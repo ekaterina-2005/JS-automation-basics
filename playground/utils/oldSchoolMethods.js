@@ -1,10 +1,10 @@
-import { InvalidInputError } from './errors.js';
-import { isDataArray } from './validators.js';
+import { InvalidInputError } from '../../src/utils/errors.js';
+import { isDataArray } from '../../src/utils/validators.js';
 import { TRUE_STRING } from '../../config/constants.js';
 import { parseCurrentPrice } from './cleaner.js';
 
 /**
- * Filters an array of products by their publication status using .filter().
+ * Filters an array of products by their publication status using a classic for loop.
  * Supports both boolean true and string "true" as valid published states.
  *
  * @param {Array<Object>} data - The array of product objects to filter.
@@ -12,57 +12,70 @@ import { parseCurrentPrice } from './cleaner.js';
  * @returns {Array<Object>} A new array containing only matching products.
  * @throws {InvalidInputError} If the provided data argument is not an array.
  */
-export function filterModern(data, targetStatus) {
+export function filterOldSchool(data, targetStatus) {
   isDataArray(data);
 
-  const filteredData = data.filter((product) => {
+  const filteredData = [];
+
+  for (let i = 0; i < data.length; i++) {
+    const product = data[i];
+
     const isPublished =
       product.isPublished === true || product.isPublished === TRUE_STRING;
-
-    return isPublished === targetStatus;
-  });
+    if (isPublished === targetStatus) {
+      filteredData.push(product);
+    }
+  }
 
   return filteredData;
 }
 
 /**
- * Extracts product names from an array of objects and converts them to uppercase using .map().
+ * Extracts product names from an array of objects and converts them to uppercase using a classic for loop.
  *
  * @param {Array<{ productName: string, [key: string]: any }>} data - The array of product objects to transform.
  * @returns {string[]} A new array containing the uppercase product names.
  * @throws {InvalidInputError} If the provided data argument is not an array.
  */
-export function transformModern(data) {
+export function transformOldSchool(data) {
   isDataArray(data);
 
-  const transformedProductNames = data.map((product) => {
+  const transformedProductNames = [];
+
+  for (let i = 0; i < data.length; i++) {
+    const product = data[i];
+
     if (typeof product.productName === 'string') {
-      return product.productName.toUpperCase();
+      transformedProductNames.push(product.productName.toUpperCase());
     } else {
       throw new InvalidInputError('All product names must be a string.');
     }
-  });
+  }
 
   return transformedProductNames;
 }
 
 /**
- * Calculates the total cost of all valid items in the cart using .reduce().
+ * Calculates the total cost of all valid items in the cart using a classic for loop.
  *
  * @param {Array<Object>} data - An array of product objects containing currentPrice and stockQty.
  * @returns {number} The total calculated price of all products.
  * @throws {InvalidInputError} If the provided data argument is not an array.
  */
-export function aggregateModern(data) {
+export function aggregateOldSchool(data) {
   isDataArray(data);
 
-  const totalPrice = data.reduce((total, product) => {
+  let totalPrice = 0;
+
+  for (let i = 0; i < data.length; i++) {
+    const product = data[i];
+
     if (!product || typeof product.stockQty !== 'number') {
-      return total;
+      continue;
     }
 
-    return total + parseCurrentPrice(product.currentPrice) * product.stockQty;
-  }, 0);
+    totalPrice += parseCurrentPrice(product.currentPrice) * product.stockQty;
+  }
 
   return totalPrice;
 }

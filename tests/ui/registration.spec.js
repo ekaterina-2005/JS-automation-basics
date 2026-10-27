@@ -1,8 +1,8 @@
 // @ts-check
 
-import { test, expect } from '../../fixtures/index.js';
-import { RegistrationPage } from '../../pages/RegistrationPage.js';
-import { LoginPage } from '../../pages/LoginPage.js';
+import { test, expect } from '../../src/fixtures/ui.js';
+import { RegistrationPage } from '../../src/pages/RegistrationPage.js';
+import { LoginPage } from '../../src/pages/LoginPage.js';
 import { createUniqueEmail } from '../../src/utils/validators.js';
 import {
   INVALID_EMAIL,

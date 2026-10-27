@@ -1,10 +1,10 @@
 // @ts-check
 
 import { test as base, expect } from '@playwright/test';
-import { JuiceShopClient } from '../src/JuiceShopClient.js';
-import { buildBasketItem } from '../src/utils/apiHelpers.js';
-import { createUniqueEmail } from '../src/utils/validators.js';
-import { getBasketIdFromToken } from '../src/utils/jwt.js';
+import { JuiceShopClient } from '../api/JuiceShopClient.js';
+import { buildBasketItem } from '../utils/apiHelpers.js';
+import { createUniqueEmail } from '../utils/validators.js';
+import { getBasketIdFromToken } from '../utils/jwt.js';
 import {
   SEARCH_QUERY,
   SEARCHED_ITEM_NAME,
@@ -12,7 +12,7 @@ import {
   TEST_EMAIL_DOMAIN,
   TEST_EMAIL_PREFIX,
   TEST_USER_PASSWORD,
-} from '../config/constants.js';
+} from '../../config/constants.js';
 
 /**
  * @typedef {object} ApiUser

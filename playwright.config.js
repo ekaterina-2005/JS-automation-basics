@@ -43,7 +43,6 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
-  /* Opt out of parallel tests on CI. */
   /* CI: the runner has 4 vCPU. Locally: all tests use one local server, 8 parallel browsers overload the machine. */
   workers: process.env.CI ? 2 : 4,
   /* CI: progress in the log + annotations in GitHub + HTML report for the artifact */
@@ -80,6 +79,12 @@ export default defineConfig({
       testDir: './tests/api',
     },
 
+    /* Tests of public services (ReqRes): they need the internet and do not need Juice Shop */
+    {
+      name: 'external',
+      testDir: './tests/external',
+    },
+
     {
       name: 'chromium',
       testDir: './tests/ui',
@@ -97,26 +102,6 @@ export default defineConfig({
       testDir: './tests/ui',
       use: { ...devices['Desktop Safari'] },
     },
-
-    /* Test against mobile viewports. */
-    // {
-    //   name: 'Mobile Chrome',
-    //   use: { ...devices['Pixel 5'] },
-    // },
-    // {
-    //   name: 'Mobile Safari',
-    //   use: { ...devices['iPhone 12'] },
-    // },
-
-    /* Test against branded browsers. */
-    // {
-    //   name: 'Microsoft Edge',
-    //   use: { ...devices['Desktop Edge'], channel: 'msedge' },
-    // },
-    // {
-    //   name: 'Google Chrome',
-    //   use: { ...devices['Desktop Chrome'], channel: 'chrome' },
-    // },
   ],
 
   /* Run your local dev server before starting the tests */

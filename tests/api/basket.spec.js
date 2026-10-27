@@ -1,6 +1,6 @@
 // @ts-check
 
-import { test, expect } from '../../fixtures/api.js';
+import { test, expect } from '../../src/fixtures/api.js';
 import { basketItemSchema, basketSchema } from '../../schemas/basket.schema.js';
 import {
   attachResponse,
@@ -25,7 +25,7 @@ const EMPTY_DELETE_BODY = { status: 'success', data: {} };
 /**
  * Gets the products of a basket with the token of its owner.
  *
- * @param {import('../../src/JuiceShopClient.js').JuiceShopClient} api - The JuiceShopClient object.
+ * @param {import('../../src/api/JuiceShopClient.js').JuiceShopClient} api - The JuiceShopClient object.
  * @param {{ token: string, basketId: number }} owner - The owner of the basket.
  * @returns {Promise<BasketProduct[]>} The products in the basket.
  */

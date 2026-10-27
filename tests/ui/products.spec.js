@@ -1,7 +1,7 @@
 // @ts-check
 
-import { test, expect } from '../../fixtures/index.js';
-import { ProductsPage } from '../../pages/ProductsPage.js';
+import { test, expect } from '../../src/fixtures/ui.js';
+import { ProductsPage } from '../../src/pages/ProductsPage.js';
 import {
   OWASP_PRODUCTS_PAGE_URL,
   PRODUCT_PRICE_PATTERN,
