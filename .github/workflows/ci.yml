@@ -128,6 +128,19 @@ jobs:
     if: ${{ github.event_name != 'workflow_dispatch' || inputs.test_type == 'ui' || inputs.test_type == 'all' }}
     runs-on: *runner
     timeout-minutes: 10
+    # Browsers and their system libraries are already in the image: no apt and no browser download
+    container:
+      # The tag must match the Playwright version in package-lock.json
+      image: mcr.microsoft.com/playwright:v1.63.0-noble
+      # Running as the same user as the GitHub runner
+      options: --user 1001
+    # Juice Shop runs next to the job container and is reachable by the service name
+    services:
+      juice-shop:
+        # Same as JUICE_SHOP_IMAGE: `env` is not available in `services`
+        image: bkimminich/juice-shop:v20.2.0
+    env:
+      BASE_URL: http://juice-shop:3000
     strategy:
       # By default - true, the failure of one job in a matrix cancels the others
       fail-fast: false
@@ -145,20 +158,6 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
-
-      # apt waits for a slow mirror without a limit: fail a stuck download after 30s and retry it
-      - name: Configure apt retries
-        run: |
-          echo 'Acquire::Retries "5"; Acquire::http::Timeout "30"; Acquire::https::Timeout "30";' \
-            | sudo tee /etc/apt/apt.conf.d/80-retries
-
-      # Only the browser of current matrix job of the Playwright version from package-lock.json + its system libraries
-      - name: Install Playwright browser
-        timeout-minutes: 5
-        run: npx playwright install --with-deps ${{ matrix.browser }}
-
-      - name: Start Juice Shop
-        run: docker run -d --name juice-shop -p 3000:3000 ${{ env.JUICE_SHOP_IMAGE }}
 
       - name: Wait for Juice Shop
         run: |
@@ -184,7 +183,3 @@ jobs:
           path: test-results/
           if-no-files-found: ignore
           retention-days: 7
-
-      - name: Juice Shop logs
-        if: failure()
-        run: docker logs --tail 200 juice-shop
