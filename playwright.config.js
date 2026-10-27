@@ -66,9 +66,14 @@ export default defineConfig({
     /* Base URL to use in actions like `await page.goto('')`. */
     baseURL: BASE_URL,
 
-    /* Kept only for failed tests */
+    /*
+     * Kept only for failed tests.
+     * With retries on CI, `retain-on-failure` keeps a trace of every failed attempt,
+     * `on-first-retry` would lose the first failure.
+     */
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
+    video: 'retain-on-failure',
   },
 
   /* Configure projects for major browsers */
