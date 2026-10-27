@@ -139,7 +139,7 @@ test.describe('Basket', () => {
         basketPage.cell(BASKET_PRODUCT, String(DOUBLE_QUANTITY)),
       ).toBeVisible();
       await expect(basketPage.totalPrice).toHaveText(
-        `${TOTAL_PRICE_LABEL}${BASKET_PRODUCT_PRICE}`, // Broken on purpose
+        `${TOTAL_PRICE_LABEL}${BASKET_PRODUCT_DOUBLE_PRICE}`,
       );
     });
   });
