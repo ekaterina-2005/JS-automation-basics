@@ -81,8 +81,8 @@ export class BasePage {
    * @returns {Promise<void>} Resolves when both popups are dismissed.
    */
   async dismissPopups() {
-    await this.closeWelcomeButton.click();
-    await this.acceptCookiesButton.click();
+    await this.closeWelcomeBanner();
+    await this.acceptCookies();
   }
 
   /**
