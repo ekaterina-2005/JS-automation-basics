@@ -2,7 +2,7 @@
 
 import { test as base, expect } from '@playwright/test';
 import { JuiceShopClient } from '../api/JuiceShopClient.js';
-import { buildBasketItem } from '../utils/apiHelpers.js';
+import { buildBasketItem } from '../data/basketItemFactory.js';
 import { buildUser } from '../data/userFactory.js';
 import { getBasketIdFromToken } from '../utils/jwt.js';
 import {

@@ -2,9 +2,9 @@
 
 import { test, expect } from '../../src/fixtures/api.js';
 import { basketItemSchema, basketSchema } from '../../schemas/basket.schema.js';
+import { buildBasketItem } from '../../src/data/basketItemFactory.js';
 import {
   attachResponse,
-  buildBasketItem,
   expectClientError,
   expectNoServerError,
   expectToMatchSchema,
