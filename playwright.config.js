@@ -43,8 +43,12 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
-  /* CI: the runner has 4 vCPU. Locally: all tests use one local server, 8 parallel browsers overload the machine. */
-  workers: process.env.CI ? 2 : 4,
+  /*
+   * CI: the runner has 4 vCPU, each job has its own Juice Shop.
+   * Locally: all workers use one Juice Shop container, 8 parallel browsers overload the machine,
+   * 2 workers are faster than 1 or 4.
+   */
+  workers: 2,
   /* CI: progress in the log + annotations in GitHub + HTML report for the artifact */
   reporter: process.env.CI
     ? [
