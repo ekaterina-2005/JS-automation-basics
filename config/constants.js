@@ -104,8 +104,10 @@ export const ENDPOINTS = {
 export const HTTP_STATUS = {
   OK: 200,
   CREATED: 201,
+  NO_CONTENT: 204,
   UNAUTHORIZED: 401,
   FORBIDDEN: 403,
+  NOT_FOUND: 404,
 };
 export const HEADERS = {
   AUTHORIZATION: 'Authorization',
@@ -120,3 +122,9 @@ export const LONG_QUERY_LENGTH = 300;
 export const NON_EXISTING_ID = 999999;
 export const SEARCH_QUERY = 'Apple';
 export const SEARCHED_ITEM_NAME = 'Apple Juice (1000ml)';
+
+// React API Data Sample
+export const STAND_ENDPOINTS = {
+  LOGIN: 'api/auth/login',
+  TASKS: 'api/tasks/',
+};
