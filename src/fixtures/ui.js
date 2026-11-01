@@ -3,17 +3,16 @@
 import { test as base, expect } from '@playwright/test';
 import { BasePage } from '../pages/BasePage.js';
 import { LoginPage } from '../pages/LoginPage.js';
-import { RegistrationPage } from '../pages/RegistrationPage.js';
 import { createUniqueEmail } from '../utils/validators.js';
 import {
   JSON_CONTENT_TYPE,
   TEST_EMAIL_PREFIX,
   TEST_EMAIL_DOMAIN,
   TEST_USER_PASSWORD,
-  TEST_SECURITY_ANSWER,
-  OWASP_LOGIN_PAGE_URL,
   OWASP_PRODUCTS_PAGE_URL,
+  HTTP_STATUS,
 } from '../../config/constants.js';
+import { JuiceShopClient } from '../api/JuiceShopClient.js';
 
 /**
  * @typedef {object} User
@@ -36,24 +35,22 @@ export const test = /** @type {typeof base.extend<Fixtures>} */ (base.extend)({
     await use(page);
   },
 
-  user: async ({ dismissedPage }, use, testInfo) => {
-    const loginPage = new LoginPage(dismissedPage);
-    const registrationPage = new RegistrationPage(dismissedPage);
+  // Registered through the API
+  user: async ({ request }, use, testInfo) => {
+    const api = new JuiceShopClient(request);
     // A new user for each test
     const user = {
       email: createUniqueEmail(TEST_EMAIL_PREFIX, TEST_EMAIL_DOMAIN),
       password: TEST_USER_PASSWORD,
     };
 
-    await loginPage.goToLogin();
-    await loginPage.goToRegistration();
-    await registrationPage.fillForm({
+    const response = await api.register({
       ...user,
-      securityAnswer: TEST_SECURITY_ANSWER,
+      passwordRepeat: user.password,
     });
-    await registrationPage.register();
-    await expect(registrationPage.successMessage).toBeVisible();
-    await expect(dismissedPage).toHaveURL(OWASP_LOGIN_PAGE_URL);
+    expect(response.status, 'User must be registered.').toBe(
+      HTTP_STATUS.CREATED,
+    );
 
     // The failure can be reproduced with the same data on one's own
     await testInfo.attach('User data', {
@@ -67,7 +64,7 @@ export const test = /** @type {typeof base.extend<Fixtures>} */ (base.extend)({
   authenticatedPage: async ({ dismissedPage, user }, use) => {
     const loginPage = new LoginPage(dismissedPage);
 
-    // After the registration the app is already on the Login page
+    await loginPage.goToLogin();
     await loginPage.fillCredentials(user.email, user.password);
     await loginPage.login();
     await expect(dismissedPage).toHaveURL(OWASP_PRODUCTS_PAGE_URL);

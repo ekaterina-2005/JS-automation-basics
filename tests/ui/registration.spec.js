@@ -174,6 +174,7 @@ test.describe('Registration', () => {
     dismissedPage,
     user,
   }) => {
+    await loginPage.goToLogin();
     await loginPage.goToRegistration();
     await expect(dismissedPage).toHaveURL(OWASP_REGISTRATION_PAGE_URL);
 
