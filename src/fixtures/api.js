@@ -3,15 +3,12 @@
 import { test as base, expect } from '@playwright/test';
 import { JuiceShopClient } from '../api/JuiceShopClient.js';
 import { buildBasketItem } from '../utils/apiHelpers.js';
-import { createUniqueEmail } from '../utils/validators.js';
+import { buildUser } from '../data/userFactory.js';
 import { getBasketIdFromToken } from '../utils/jwt.js';
 import {
   SEARCH_QUERY,
   SEARCHED_ITEM_NAME,
   HTTP_STATUS,
-  TEST_EMAIL_DOMAIN,
-  TEST_EMAIL_PREFIX,
-  TEST_USER_PASSWORD,
 } from '../../config/constants.js';
 
 /**
@@ -48,22 +45,20 @@ import {
  * @returns {Promise<ApiUser>} The new user with the token and the basket id.
  */
 async function registerUser(api) {
-  const email = createUniqueEmail(TEST_EMAIL_PREFIX, TEST_EMAIL_DOMAIN);
+  const user = buildUser();
   const registration = await api.register({
-    email,
-    password: TEST_USER_PASSWORD,
-    passwordRepeat: TEST_USER_PASSWORD,
+    ...user,
+    passwordRepeat: user.password,
   });
   expect(registration.status, 'User must be registered.').toBe(
     HTTP_STATUS.CREATED,
   );
 
-  const token = await api.getToken(email, TEST_USER_PASSWORD);
+  const token = await api.getToken(user.email, user.password);
 
   return {
     id: registration.body.data.id,
-    email,
-    password: TEST_USER_PASSWORD,
+    ...user,
     token,
     basketId: getBasketIdFromToken(token),
   };

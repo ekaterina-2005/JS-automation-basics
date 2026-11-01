@@ -3,21 +3,16 @@
 import { test as base, expect } from '@playwright/test';
 import { BasePage } from '../pages/BasePage.js';
 import { LoginPage } from '../pages/LoginPage.js';
-import { createUniqueEmail } from '../utils/validators.js';
+import { buildUser } from '../data/userFactory.js';
 import {
   JSON_CONTENT_TYPE,
-  TEST_EMAIL_PREFIX,
-  TEST_EMAIL_DOMAIN,
-  TEST_USER_PASSWORD,
   OWASP_PRODUCTS_PAGE_URL,
   HTTP_STATUS,
 } from '../../config/constants.js';
 import { JuiceShopClient } from '../api/JuiceShopClient.js';
 
 /**
- * @typedef {object} User
- * @property {string} email - The email of the user.
- * @property {string} password - The password of the user.
+ * @typedef {import('../data/userFactory.js').UserData} User
  */
 /**
  * @typedef {object} Fixtures
@@ -39,10 +34,7 @@ export const test = /** @type {typeof base.extend<Fixtures>} */ (base.extend)({
   user: async ({ request }, use, testInfo) => {
     const api = new JuiceShopClient(request);
     // A new user for each test
-    const user = {
-      email: createUniqueEmail(TEST_EMAIL_PREFIX, TEST_EMAIL_DOMAIN),
-      password: TEST_USER_PASSWORD,
-    };
+    const user = buildUser();
 
     const response = await api.register({
       ...user,
