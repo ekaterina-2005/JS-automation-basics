@@ -128,3 +128,18 @@ export const STAND_ENDPOINTS = {
   LOGIN: 'api/auth/login',
   TASKS: 'api/tasks/',
 };
+export const TASK_STATUS = {
+  TO_DO: 'TO_DO',
+  IN_PROGRESS: 'IN_PROGRESS',
+  PENDING: 'PENDING',
+  COMPLETED: 'COMPLETED',
+};
+export const TASK_PRIORITY = {
+  LOW: 'LOW',
+  MEDIUM: 'MEDIUM',
+  HIGH: 'HIGH',
+};
+export const TASK_TITLE_PREFIX = 'aqa-';
+// The API shields while preserving text fields (express-validator `escape()`), so test texts have no ' " < > & /
+export const TASK_DESCRIPTION = 'Created by an autotest';
+export const TASK_DUE_DATE = '2030-01-01T00:00:00.000Z';
