@@ -6,12 +6,25 @@ import { execSync } from 'child_process';
 // The container is created with `docker create`
 const JUICE_SHOP_CONTAINER = 'juice-shop';
 const BASE_URL = process.env.BASE_URL ?? 'http://localhost:3000';
+// API of the stand for the database tests (started with docker compose)
+const STAND_PROJECT = 'stand';
+const STAND_API_URL = process.env.STAND_API_URL ?? 'http://localhost:4000';
+
+/* Projects selected with `--project=name` */
+const SELECTED_PROJECTS = process.argv
+  .filter((arg) => arg.startsWith('--project='))
+  .map((arg) => arg.slice('--project='.length));
+
+/* A run of only `--project=stand` does not start the Juice Shop container */
+const NEEDS_LOCAL_START =
+  SELECTED_PROJECTS.length === 0 ||
+  SELECTED_PROJECTS.some((name) => name !== STAND_PROJECT);
 
 /*
  * true: Playwright starts the local container itself.
  * false: CI starts Juice Shop and waits until it is ready, Playwright does not restart any container.
  */
-const LOCAL_START = process.env.LOCAL_START !== 'false'; // By default LOCAL_START = true
+const LOCAL_START = process.env.LOCAL_START !== 'false' && NEEDS_LOCAL_START; // By default LOCAL_START = true
 
 /*
  * Only the main process stops the container, when the whole run is finished.
@@ -92,6 +105,16 @@ export default defineConfig({
     {
       name: 'external',
       testDir: './tests/external',
+    },
+
+    /*
+     * Stand (React API Data Sample): API + PostgreSQL, no browser.
+     * Needs the running stand and the internet (login through Supabase).
+     */
+    {
+      name: STAND_PROJECT,
+      testDir: './tests/stand',
+      use: { baseURL: STAND_API_URL },
     },
 
     {
