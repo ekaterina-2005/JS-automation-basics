@@ -1,4 +1,5 @@
 // @ts-check
+
 import 'dotenv/config';
 import { defineConfig, devices } from '@playwright/test';
 import { execSync } from 'child_process';

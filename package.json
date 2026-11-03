@@ -13,6 +13,7 @@
     "test:ui": "playwright test tests/ui",
     "test:api": "playwright test --project=api --project=external",
     "test:stand": "playwright test --project=stand",
+    "test:perf": "playwright test --config=playwright.perf.config.js",
     "playground": "node playground/index.js"
   },
   "lint-staged": {
