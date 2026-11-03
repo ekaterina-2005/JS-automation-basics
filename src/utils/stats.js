@@ -1,6 +1,6 @@
 // @ts-check
 
-import { InvalidInputError } from '../utils/errors.js';
+import { InvalidInputError } from './errors.js';
 
 // Statistics for the performance experiment
 
