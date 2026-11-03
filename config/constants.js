@@ -1,3 +1,4 @@
+// Playground
 export const BACKEND_DATA = [
   {
     id: 1,
@@ -103,8 +104,10 @@ export const ENDPOINTS = {
 export const HTTP_STATUS = {
   OK: 200,
   CREATED: 201,
+  NO_CONTENT: 204,
   UNAUTHORIZED: 401,
   FORBIDDEN: 403,
+  NOT_FOUND: 404,
 };
 export const HEADERS = {
   AUTHORIZATION: 'Authorization',
@@ -119,3 +122,26 @@ export const LONG_QUERY_LENGTH = 300;
 export const NON_EXISTING_ID = 999999;
 export const SEARCH_QUERY = 'Apple';
 export const SEARCHED_ITEM_NAME = 'Apple Juice (1000ml)';
+
+// React API Data Sample
+export const STAND_ENDPOINTS = {
+  LOGIN: 'api/auth/login',
+  TASKS: 'api/tasks/',
+};
+export const TASK_STATUS = {
+  TO_DO: 'TO_DO',
+  IN_PROGRESS: 'IN_PROGRESS',
+  PENDING: 'PENDING',
+  COMPLETED: 'COMPLETED',
+};
+export const TASK_PRIORITY = {
+  LOW: 'LOW',
+  MEDIUM: 'MEDIUM',
+  HIGH: 'HIGH',
+};
+export const TASK_TITLE_PREFIX = 'aqa-';
+// The API shields while preserving text fields (express-validator `escape()`), so test texts have no ' " < > & /
+export const TASK_DESCRIPTION = 'Created by an autotest';
+export const TASK_DUE_DATE = '2030-01-01T00:00:00.000Z';
+export const TASK_NOT_FOUND_MESSAGE = 'Task not found';
+export const AUTH_REQUIRED_MESSAGE = 'Authentication required. Please log in.';

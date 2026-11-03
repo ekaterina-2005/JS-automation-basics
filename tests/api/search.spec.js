@@ -1,6 +1,6 @@
 // @ts-check
 
-import { test, expect } from '../../fixtures/api.js';
+import { test, expect } from '../../src/fixtures/api.js';
 import { productListSchema } from '../../schemas/product.schema.js';
 import {
   expectNoServerError,

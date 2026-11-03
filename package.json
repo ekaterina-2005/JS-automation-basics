@@ -9,10 +9,12 @@
     "format:check": "prettier --check .",
     "lint": "eslint .",
     "prepare": "husky",
-    "test": "node src/index.js",
-    "test:all": "playwright test",
+    "test": "playwright test",
     "test:ui": "playwright test tests/ui",
-    "test:api": "playwright test --project=api"
+    "test:api": "playwright test --project=api --project=external",
+    "test:stand": "playwright test --project=stand",
+    "test:perf": "playwright test --config=playwright.perf.config.js",
+    "playground": "node playground/index.js"
   },
   "lint-staged": {
     "*.js": [
@@ -41,6 +43,7 @@
     "globals": "^17.12.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.4.0",
+    "pg": "^8.23.1",
     "prettier": "^3.9.8"
   },
   "dependencies": {

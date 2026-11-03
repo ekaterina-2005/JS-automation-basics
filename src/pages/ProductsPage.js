@@ -38,9 +38,9 @@ export class ProductsPage extends BasePage {
    * @returns {import('@playwright/test').Locator} The locator of the product card.
    */
   productCard(name) {
-    return this.page
-      .getByRole('article')
-      .filter({ has: this.page.getByRole('img', { name, exact: true }) });
+    return this.productCards.filter({
+      has: this.page.getByRole('img', { name, exact: true }),
+    });
   }
 
   /**

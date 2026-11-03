@@ -1,17 +1,15 @@
 // @ts-check
 
-import { test, expect } from '../../fixtures/index.js';
-import { RegistrationPage } from '../../pages/RegistrationPage.js';
-import { LoginPage } from '../../pages/LoginPage.js';
-import { createUniqueEmail } from '../../src/utils/validators.js';
+import { test, expect } from '../../src/fixtures/ui.js';
+import { RegistrationPage } from '../../src/pages/RegistrationPage.js';
+import { LoginPage } from '../../src/pages/LoginPage.js';
+import { buildUser } from '../../src/data/userFactory.js';
 import {
   INVALID_EMAIL,
   MASKED_INPUT_TYPE,
   MISMATCHED_PASSWORD,
   OWASP_LOGIN_PAGE_URL,
   OWASP_REGISTRATION_PAGE_URL,
-  TEST_EMAIL_DOMAIN,
-  TEST_EMAIL_PREFIX,
   TEST_SECURITY_ANSWER,
   TEST_USER_PASSWORD,
   TOO_LONG_PASSWORD,
@@ -97,16 +95,16 @@ test.describe('Registration', () => {
     });
 
     test('"Register" button state when a required field is empty', async () => {
+      const user = buildUser();
+
       await test.step('All fields are empty', async () => {
         await expect(registrationPage.registerButton).toBeDisabled();
       });
 
       await test.step('All fields are valid except "Security Question"', async () => {
-        await registrationPage.fillEmail(
-          createUniqueEmail(TEST_EMAIL_PREFIX, TEST_EMAIL_DOMAIN),
-        );
-        await registrationPage.fillPassword(TEST_USER_PASSWORD);
-        await registrationPage.fillRepeatPassword(TEST_USER_PASSWORD);
+        await registrationPage.fillEmail(user.email);
+        await registrationPage.fillPassword(user.password);
+        await registrationPage.fillRepeatPassword(user.password);
         await registrationPage.fillSecurityAnswer(TEST_SECURITY_ANSWER);
 
         await expect(registrationPage.registerButton).toBeDisabled();
@@ -128,20 +126,18 @@ test.describe('Registration', () => {
 
     test('Register with valid data', async ({ dismissedPage }) => {
       // A unique email for each run, so the test does not depend on users created earlier
-      const email = createUniqueEmail(TEST_EMAIL_PREFIX, TEST_EMAIL_DOMAIN);
+      const user = buildUser();
 
-      await registrationPage.fillEmail(email);
+      await registrationPage.fillEmail(user.email);
 
-      await expect(registrationPage.emailInput).toHaveValue(email);
+      await expect(registrationPage.emailInput).toHaveValue(user.email);
 
-      await registrationPage.fillPassword(TEST_USER_PASSWORD);
-      await registrationPage.fillRepeatPassword(TEST_USER_PASSWORD);
+      await registrationPage.fillPassword(user.password);
+      await registrationPage.fillRepeatPassword(user.password);
 
-      await expect(registrationPage.passwordInput).toHaveValue(
-        TEST_USER_PASSWORD,
-      );
+      await expect(registrationPage.passwordInput).toHaveValue(user.password);
       await expect(registrationPage.repeatPasswordInput).toHaveValue(
-        TEST_USER_PASSWORD,
+        user.password,
       );
       await expect(registrationPage.passwordInput).toHaveAttribute(
         'type',
@@ -174,6 +170,7 @@ test.describe('Registration', () => {
     dismissedPage,
     user,
   }) => {
+    await loginPage.goToLogin();
     await loginPage.goToRegistration();
     await expect(dismissedPage).toHaveURL(OWASP_REGISTRATION_PAGE_URL);
 

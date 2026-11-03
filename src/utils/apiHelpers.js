@@ -5,18 +5,6 @@ import { JSON_CONTENT_TYPE } from '../../config/constants.js';
 import Ajv from 'ajv';
 
 /**
- * Builds the body of POST for basket items.
- *
- * @param {number | string} productId - The product id.
- * @param {number | string} basketId - The basket id.
- * @param {unknown} [quantity=1] - The quantity. Any type, so negative checks can send wrong values.
- * @returns {{ ProductId: number | string, BasketId: string, quantity: unknown }} The basket item data.
- */
-export function buildBasketItem(productId, basketId, quantity = 1) {
-  return { ProductId: productId, BasketId: String(basketId), quantity };
-}
-
-/**
  * Checks that the status is a client error (4xx): the request is rejected, and the server does not fail.
  *
  * @param {number} status - The HTTP status of the response.

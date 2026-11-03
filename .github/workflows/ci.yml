@@ -12,8 +12,8 @@ on:
       - main
     types: [opened, synchronize, reopened]
   # Nightly run (only from the default branch)
-  schedule:
-    - cron: '15 0 * * *'
+  # schedule:
+  #   - cron: '15 0 * * *'
   # Manual run from the Actions tab
   workflow_dispatch:
     inputs:
@@ -23,6 +23,8 @@ on:
         options:
           - ui
           - api
+          - stand
+          - performance
           - all
         required: true
         default: 'all'
@@ -66,7 +68,7 @@ jobs:
 
   api:
     name: API tests
-    # api and ui run in parallel after lint
+    # api, ui and stand run in parallel after lint
     needs: lint
     if: ${{ github.event_name != 'workflow_dispatch' || inputs.test_type == 'api' || inputs.test_type == 'all' }}
     runs-on: *runner
@@ -93,7 +95,9 @@ jobs:
         run: docker run -d --name juice-shop -p 3000:3000 ${{ env.JUICE_SHOP_IMAGE }}
 
       - name: Wait for Juice Shop
-        run: timeout 120 bash -c 'until curl -fs -o /dev/null ${{ env.BASE_URL }}; do sleep 2; done' || { echo "::error::Juice Shop did not start in 120 seconds"; exit 1; }
+        run: |
+          timeout 120 bash -c 'until curl -fs -o /dev/null ${{ env.BASE_URL }}; do sleep 2; done' \
+            || { echo "::error::Juice Shop did not start in 120 seconds"; exit 1; }
 
       - name: Run API tests
         run: npm run test:api
@@ -121,11 +125,24 @@ jobs:
 
   ui:
     name: UI tests (${{ matrix.browser }})
-    # api and ui run in parallel after lint
+    # api, ui and stand run in parallel after lint
     needs: lint
     if: ${{ github.event_name != 'workflow_dispatch' || inputs.test_type == 'ui' || inputs.test_type == 'all' }}
     runs-on: *runner
     timeout-minutes: 10
+    # Browsers and their system libraries are already in the image: no apt and no browser download
+    container:
+      # The tag must match the Playwright version in package-lock.json
+      image: mcr.microsoft.com/playwright:v1.63.0-noble
+      # Running as the same user as the GitHub runner
+      options: --user 1001
+    # Juice Shop runs next to the job container and is reachable by the service name
+    services:
+      juice-shop:
+        # Same as JUICE_SHOP_IMAGE: `env` is not available in `services`
+        image: bkimminich/juice-shop:v20.2.0
+    env:
+      BASE_URL: http://juice-shop:3000
     strategy:
       # By default - true, the failure of one job in a matrix cancels the others
       fail-fast: false
@@ -144,15 +161,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # Only the browser of current matrix job of the Playwright version from package-lock.json + its system libraries
-      - name: Install Playwright browser
-        run: npx playwright install --with-deps ${{ matrix.browser }}
-
-      - name: Start Juice Shop
-        run: docker run -d --name juice-shop -p 3000:3000 ${{ env.JUICE_SHOP_IMAGE }}
-
       - name: Wait for Juice Shop
-        run: timeout 120 bash -c 'until curl -fs -o /dev/null ${{ env.BASE_URL }}; do sleep 2; done' || { echo "::error::Juice Shop did not start in 120 seconds"; exit 1; }
+        run: |
+          timeout 120 bash -c 'until curl -fs -o /dev/null ${{ env.BASE_URL }}; do sleep 2; done' \
+            || { echo "::error::Juice Shop did not start in 120 seconds"; exit 1; }
 
       - name: Run UI tests
         run: npm run test:ui -- --project=${{ matrix.browser }}
@@ -174,6 +186,96 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
-      - name: Juice Shop logs
+  stand:
+    name: ${{ inputs.test_type == 'performance' && 'Performance experiment' || 'Stand tests (API + DB)' }}
+    # api, ui and stand run in parallel after lint
+    needs: lint
+    # Only when the secrets of the stand are set: the variable STAND_TESTS_ENABLED = true in Settings
+    if: ${{ vars.STAND_TESTS_ENABLED == 'true' && (github.event_name != 'workflow_dispatch' || inputs.test_type == 'stand' || inputs.test_type == 'performance' || inputs.test_type == 'all') }}
+    runs-on: *runner
+    timeout-minutes: 15
+    env:
+      # Supabase of the stand: docker compose takes these values instead of the ones in .env of the stand
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+      # The tests: the same variables as in .env.example
+      STAND_API_URL: http://localhost:4000
+      STAND_USER_EMAIL: ${{ secrets.STAND_USER_EMAIL }}
+      STAND_USER_PASSWORD: ${{ secrets.STAND_USER_PASSWORD }}
+      DB_HOST: localhost
+      DB_PORT: 5433
+      DB_NAME: taskmanager_db
+      DB_USER: taskmanager_postgres
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Clone the stand
+        uses: actions/checkout@v7
+        with:
+          repository: opudrovs/react-api-data-sample
+          # Fixed commit
+          ref: 208b3e9e5958cef39a319f11ab62a386a5de1c42
+          path: stand
+
+      - name: Start the stand
+        working-directory: stand
+        # Without the frontend
+        run: |
+          cp .env.example .env
+          docker compose up --build -d postgres backend
+
+      - name: Wait for the stand
+        # The Swagger page returns 200 without authorization
+        run: |
+          timeout 300 bash -c 'until curl -fs -o /dev/null ${{ env.STAND_API_URL }}/api-docs/; do sleep 5; done' \
+            || { echo "::error::The stand did not start in 300 seconds"; exit 1; }
+
+      - name: Run stand tests
+        if: inputs.test_type != 'performance'
+        run: npm run test:stand
+
+      - name: Run performance experiment
+        # Manual run with performance only
+        if: inputs.test_type == 'performance'
+        run: npm run test:perf
+
+      - name: Upload HTML report
+        if: always() && inputs.test_type != 'performance'
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report-stand
+          path: playwright-report/
+          retention-days: 7
+
+      - name: Upload test results
+        if: always() && inputs.test_type != 'performance'
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-results-stand
+          path: test-results/
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Upload performance report
+        if: always() && inputs.test_type == 'performance'
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report-perf
+          path: playwright-report-perf/
+          retention-days: 7
+
+      - name: Stand logs
         if: failure()
-        run: docker logs --tail 200 juice-shop
+        working-directory: stand
+        run: docker compose logs --tail 200 backend

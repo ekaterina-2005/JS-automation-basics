@@ -1,4 +1,5 @@
 // @ts-check
+
 import 'dotenv/config';
 import { defineConfig, devices } from '@playwright/test';
 import { execSync } from 'child_process';
@@ -6,12 +7,25 @@ import { execSync } from 'child_process';
 // The container is created with `docker create`
 const JUICE_SHOP_CONTAINER = 'juice-shop';
 const BASE_URL = process.env.BASE_URL ?? 'http://localhost:3000';
+// API of the stand for the database tests (started with docker compose)
+const STAND_PROJECT = 'stand';
+const STAND_API_URL = process.env.STAND_API_URL ?? 'http://localhost:4000';
+
+/* Projects selected with `--project=name` */
+const SELECTED_PROJECTS = process.argv
+  .filter((arg) => arg.startsWith('--project='))
+  .map((arg) => arg.slice('--project='.length));
+
+/* A run of only `--project=stand` does not start the Juice Shop container */
+const NEEDS_LOCAL_START =
+  SELECTED_PROJECTS.length === 0 ||
+  SELECTED_PROJECTS.some((name) => name !== STAND_PROJECT);
 
 /*
  * true: Playwright starts the local container itself.
  * false: CI starts Juice Shop and waits until it is ready, Playwright does not restart any container.
  */
-const LOCAL_START = process.env.LOCAL_START !== 'false'; // By default LOCAL_START = true
+const LOCAL_START = process.env.LOCAL_START !== 'false' && NEEDS_LOCAL_START; // By default LOCAL_START = true
 
 /*
  * Only the main process stops the container, when the whole run is finished.
@@ -43,9 +57,12 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
-  /* Opt out of parallel tests on CI. */
-  /* CI: the runner has 4 vCPU. Locally: all tests use one local server, 8 parallel browsers overload the machine. */
-  workers: process.env.CI ? 2 : 4,
+  /*
+   * CI: the runner has 4 vCPU, each job has its own Juice Shop.
+   * Locally: all workers use one Juice Shop container, 8 parallel browsers overload the machine,
+   * 2 workers are faster than 1 or 4.
+   */
+  workers: 2,
   /* CI: progress in the log + annotations in GitHub + HTML report for the artifact */
   reporter: process.env.CI
     ? [
@@ -67,9 +84,14 @@ export default defineConfig({
     /* Base URL to use in actions like `await page.goto('')`. */
     baseURL: BASE_URL,
 
-    /* Kept only for failed tests */
+    /*
+     * Kept only for failed tests.
+     * With retries on CI, `retain-on-failure` keeps a trace of every failed attempt,
+     * `on-first-retry` would lose the first failure.
+     */
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
+    video: 'retain-on-failure',
   },
 
   /* Configure projects for major browsers */
@@ -78,6 +100,22 @@ export default defineConfig({
     {
       name: 'api',
       testDir: './tests/api',
+    },
+
+    /* Tests of public services (ReqRes): they need the internet and do not need Juice Shop */
+    {
+      name: 'external',
+      testDir: './tests/external',
+    },
+
+    /*
+     * Stand (React API Data Sample): API + PostgreSQL, no browser.
+     * Needs the running stand and the internet (login through Supabase).
+     */
+    {
+      name: STAND_PROJECT,
+      testDir: './tests/stand',
+      use: { baseURL: STAND_API_URL },
     },
 
     {
@@ -97,26 +135,6 @@ export default defineConfig({
       testDir: './tests/ui',
       use: { ...devices['Desktop Safari'] },
     },
-
-    /* Test against mobile viewports. */
-    // {
-    //   name: 'Mobile Chrome',
-    //   use: { ...devices['Pixel 5'] },
-    // },
-    // {
-    //   name: 'Mobile Safari',
-    //   use: { ...devices['iPhone 12'] },
-    // },
-
-    /* Test against branded browsers. */
-    // {
-    //   name: 'Microsoft Edge',
-    //   use: { ...devices['Desktop Edge'], channel: 'msedge' },
-    // },
-    // {
-    //   name: 'Google Chrome',
-    //   use: { ...devices['Desktop Chrome'], channel: 'chrome' },
-    // },
   ],
 
   /* Run your local dev server before starting the tests */
