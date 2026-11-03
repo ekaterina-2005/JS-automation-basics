@@ -143,3 +143,5 @@ export const TASK_TITLE_PREFIX = 'aqa-';
 // The API shields while preserving text fields (express-validator `escape()`), so test texts have no ' " < > & /
 export const TASK_DESCRIPTION = 'Created by an autotest';
 export const TASK_DUE_DATE = '2030-01-01T00:00:00.000Z';
+export const TASK_NOT_FOUND_MESSAGE = 'Task not found';
+export const AUTH_REQUIRED_MESSAGE = 'Authentication required. Please log in.';
