@@ -23,6 +23,8 @@ on:
         options:
           - ui
           - api
+          - stand
+          - performance
           - all
         required: true
         default: 'all'
@@ -66,7 +68,7 @@ jobs:
 
   api:
     name: API tests
-    # api and ui run in parallel after lint
+    # api, ui and stand run in parallel after lint
     needs: lint
     if: ${{ github.event_name != 'workflow_dispatch' || inputs.test_type == 'api' || inputs.test_type == 'all' }}
     runs-on: *runner
@@ -123,7 +125,7 @@ jobs:
 
   ui:
     name: UI tests (${{ matrix.browser }})
-    # api and ui run in parallel after lint
+    # api, ui and stand run in parallel after lint
     needs: lint
     if: ${{ github.event_name != 'workflow_dispatch' || inputs.test_type == 'ui' || inputs.test_type == 'all' }}
     runs-on: *runner
@@ -183,3 +185,97 @@ jobs:
           path: test-results/
           if-no-files-found: ignore
           retention-days: 7
+
+  stand:
+    name: ${{ inputs.test_type == 'performance' && 'Performance experiment' || 'Stand tests (API + DB)' }}
+    # api, ui and stand run in parallel after lint
+    needs: lint
+    # Only when the secrets of the stand are set: the variable STAND_TESTS_ENABLED = true in Settings
+    if: ${{ vars.STAND_TESTS_ENABLED == 'true' && (github.event_name != 'workflow_dispatch' || inputs.test_type == 'stand' || inputs.test_type == 'performance' || inputs.test_type == 'all') }}
+    runs-on: *runner
+    timeout-minutes: 15
+    env:
+      # Supabase of the stand: docker compose takes these values instead of the ones in .env of the stand
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+      # The tests: the same variables as in .env.example
+      STAND_API_URL: http://localhost:4000
+      STAND_USER_EMAIL: ${{ secrets.STAND_USER_EMAIL }}
+      STAND_USER_PASSWORD: ${{ secrets.STAND_USER_PASSWORD }}
+      DB_HOST: localhost
+      DB_PORT: 5433
+      DB_NAME: taskmanager_db
+      DB_USER: taskmanager_postgres
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Clone the stand
+        uses: actions/checkout@v7
+        with:
+          repository: opudrovs/react-api-data-sample
+          # Fixed commit
+          ref: 208b3e9e5958cef39a319f11ab62a386a5de1c42
+          path: stand
+
+      - name: Start the stand
+        working-directory: stand
+        # Without the frontend
+        run: |
+          cp .env.example .env
+          docker compose up --build -d postgres backend
+
+      - name: Wait for the stand
+        # The Swagger page returns 200 without authorization
+        run: |
+          timeout 300 bash -c 'until curl -fs -o /dev/null ${{ env.STAND_API_URL }}/api-docs/; do sleep 5; done' \
+            || { echo "::error::The stand did not start in 300 seconds"; exit 1; }
+
+      - name: Run stand tests
+        if: inputs.test_type != 'performance'
+        run: npm run test:stand
+
+      - name: Run performance experiment
+        # Manual run with performance only
+        if: inputs.test_type == 'performance'
+        run: npm run test:perf
+
+      - name: Upload HTML report
+        if: always() && inputs.test_type != 'performance'
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report-stand
+          path: playwright-report/
+          retention-days: 7
+
+      - name: Upload test results
+        if: always() && inputs.test_type != 'performance'
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-results-stand
+          path: test-results/
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Upload performance report
+        if: always() && inputs.test_type == 'performance'
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report-perf
+          path: playwright-report-perf/
+          retention-days: 7
+
+      - name: Stand logs
+        if: failure()
+        working-directory: stand
+        run: docker compose logs --tail 200 backend
