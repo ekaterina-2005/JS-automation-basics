@@ -2,13 +2,13 @@
 
 import { expect } from '@playwright/test';
 import { BasePage } from './BasePage.js';
-import { KEYS } from '../config/keycodes.js';
+import { KEYS } from '../../config/keycodes.js';
 import {
   OPEN_SELECT_TIMEOUT_MS,
   OPTION_VISIBLE_TIMEOUT_MS,
   PASSWORD_MAX_LENGTH,
   PASSWORD_MIN_LENGTH,
-} from '../config/constants.js';
+} from '../../config/constants.js';
 
 /**
  * Page Object of the User Registration page.

@@ -4,7 +4,13 @@ import { defineConfig, globalIgnores } from 'eslint/config';
 
 export default defineConfig([
   // ESLint ignores only node_modules and .git by default, it does not read .gitignore
-  globalIgnores(['playwright-report/', 'test-results/', 'blob-report/']),
+  globalIgnores([
+    'playwright-report/',
+    'test-results/',
+    'blob-report/',
+    'playwright-report-perf/',
+    'test-results-perf/',
+  ]),
   {
     files: ['**/*.{js,mjs,cjs}'],
     plugins: { js },
